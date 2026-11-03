@@ -1,0 +1,6 @@
+build*/
+build-wsl*/
+release.exe
+reldbg.exe
+.clangd
+COMPONENT.md

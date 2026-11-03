@@ -1,0 +1,339 @@
+#include "scripts_internal.h"
+
+#include "../include/collisions.h"
+#include "../include/input.h"
+#include "../include/ui.h"
+#include "../include/audio.h"
+#include <fstream>
+#include <cstring>
+
+
+sol::state lua;
+
+std::vector<ScriptInstance> scripts;
+
+void attachScript(Object* obj, std::string path)
+{
+    ScriptInstance si;
+    si.obj = obj;
+    si.path = path;
+    scripts.push_back(si);
+}
+
+static sol::object objectToLua(Object* obj)
+{
+    if (Capsule* capsule = dynamic_cast<Capsule*>(obj))
+        return sol::make_object(lua, capsule);
+
+    else if (Camera* camera = dynamic_cast<Camera*>(obj))
+        return sol::make_object(lua, camera);
+
+    else if (AudioSource* audiosource = dynamic_cast<AudioSource*>(obj))
+        return sol::make_object(lua, audiosource);
+
+    else if (AnimatedObj* animatedObj = dynamic_cast<AnimatedObj*>(obj))
+        return sol::make_object(lua, animatedObj);
+
+    else if (AnimatedMesh* animatedMesh = dynamic_cast<AnimatedMesh*>(obj))
+        return sol::make_object(lua, animatedMesh);
+
+    else if (StaticMesh* staticMesh = dynamic_cast<StaticMesh*>(obj))
+        return sol::make_object(lua, staticMesh);
+
+    else if (Mesh* mesh = dynamic_cast<Mesh*>(obj))
+        return sol::make_object(lua, mesh);
+
+    return sol::make_object(lua, obj);
+}
+
+static sol::object uiToLua(UIElement* ui)
+{
+    if (UIImage* image = dynamic_cast<UIImage*>(ui))
+        return sol::make_object(lua, image);
+
+    else if (UIText* text = dynamic_cast<UIText*>(ui))
+        return sol::make_object(lua, text);
+
+    return sol::make_object(lua, ui);
+}
+
+static void registerLuaAPI()
+{
+    lua.open_libraries(sol::lib::base, sol::lib::math);
+
+    // tell lua about the data types it can use
+    lua.new_usertype<glm::vec3>("Vec3",
+        sol::constructors<glm::vec3(float), glm::vec3(float, float, float)>(),
+        "x", &glm::vec3::x,
+        "y", &glm::vec3::y,
+        "z", &glm::vec3::z,
+        "normalize", [](glm::vec3& v) { // mutates v
+            float len = glm::length(v);
+            if (len > 1e-6f) v /= len;
+        },
+        "normalized", [](const glm::vec3& v) { // returns new v
+            float len = glm::length(v);
+            return len > 1e-6f ? v / len : glm::vec3(0.0f);
+        },
+        "length", [](const glm::vec3& v) { return glm::length(v); },
+        "dot",    [](const glm::vec3& a, const glm::vec3& b) { return glm::dot(a, b); },
+        "cross",  [](const glm::vec3& a, const glm::vec3& b) { return glm::cross(a, b); },
+        sol::meta_function::addition,    [](const glm::vec3& a, const glm::vec3 b) { return a + b; },
+        sol::meta_function::subtraction, [](const glm::vec3& a, const glm::vec3 b) { return a - b; },
+        sol::meta_function::multiplication, sol::overload(
+            [](const glm::vec3& v, float s) { return v * s; },
+            [](float s, const glm::vec3& v) { return v * s; }
+        ),
+        sol::meta_function::unary_minus, [](const glm::vec3& v) { return -v; },
+        sol::meta_function::to_string,   [](const glm::vec3& v) {
+            return "(" + std::to_string(v.x) + ", " + std::to_string(v.y) + ", " + std::to_string(v.z) + ")";
+        }
+    );
+    lua.new_usertype<UITransform>("UITransform",
+        "x", &UITransform::x,
+        "y", &UITransform::y,
+        "angle", &UITransform::angle,
+        "scaleX", &UITransform::scaleX,
+        "scaleY", &UITransform::scaleY
+    );
+    lua.new_usertype<UIElement>("UIElement",
+        "name", sol::property(&UIElement::getName, &UIElement::setName),
+        "tag", sol::property(&UIElement::getTag, &UIElement::setTag),
+        "draw", &UIElement::draw,
+        "transform", &UIElement::transform
+    );
+    lua.new_usertype<UIImage>("UIImage",
+        sol::base_classes, sol::bases<UIElement>()
+    );
+    lua.new_usertype<UIText>("UIText",
+        "text", &UIText::text,
+        "color", &UIText::color,
+        sol::base_classes, sol::bases<UIElement>()
+    );
+    lua.new_usertype<Transform>("Transform",
+        "x", &Transform::x,
+        "y", &Transform::y,
+        "z", &Transform::z,
+        "yaw", &Transform::yaw,
+        "pitch", &Transform::pitch,
+        "roll", &Transform::roll,
+        "scaleX", &Transform::scaleX,
+        "scaleY", &Transform::scaleY,
+        "scaleZ", &Transform::scaleZ,
+        "pos", [](Transform* t) { return glm::vec3{t->x, t->y, t->z}; }
+    );
+    lua.new_usertype<Rig>("Rig",
+        "currentAnim", &Rig::currentAnim,
+        "animSpeed", &Rig::animSpeed,
+        "setAnim", sol::overload(
+            [](Rig& r, int i)                 { r.setAnim(i); },
+            [](Rig& r, int i, float b)        { r.setAnim(i, b); },
+            [](Rig& r, int i, float b, int n) { r.setAnim(i, b, n); }
+        )
+    );
+    lua.new_usertype<Object>("Object",
+        "name", sol::property(&Object::getName, &Object::setName),
+        "tag", sol::property(&Object::getTag, &Object::setTag),
+        "draw", &Object::draw,
+        "transform", &Object::transform
+    );
+    lua.new_usertype<Mesh>("Mesh",
+        sol::base_classes, sol::bases<Object>()
+    );
+    lua.new_usertype<StaticMesh>("StaticMesh",
+        sol::base_classes, sol::bases<Object, Mesh>()
+    );
+    lua.new_usertype<AnimatedMesh>("AnimatedMesh",
+        "rig", &AnimatedMesh::rig,
+        sol::base_classes, sol::bases<Object, Mesh>()
+    );
+    lua.new_usertype<AnimatedObj>("AnimatedObj",
+        "rig", &AnimatedObj::rig,
+        sol::base_classes, sol::bases<Object>()
+    );
+    lua.new_usertype<Camera>("Camera",
+        "pos", sol::property(&Camera::getPos, &Camera::setPos),
+        "front", sol::property(&Camera::getFront, &Camera::setFront),
+        "up", sol::property(&Camera::getUp, &Camera::setUp),
+        "setCurrent", [](Camera* c) { currentCam = c; },
+        sol::base_classes, sol::bases<Object>()
+    );
+    lua.new_usertype<AudioSource>("AudioSource",
+        "loop", sol::property(&AudioSource::getLoop, &AudioSource::setLoop),
+        "volume", &AudioSource::volume,
+        "play", &AudioSource::Play,
+        "stop", &AudioSource::Stop,
+        sol::base_classes, sol::bases<Object>()
+    );
+    lua.new_usertype<Capsule>("Capsule",
+        "height", &Capsule::height,
+        "radius", &Capsule::radius,
+        "velocity", &Capsule::velocity,
+        "resolveCollisions", [](Capsule* cap, float deltaTime) { resolveCollisions(cap, deltaTime); },
+        sol::base_classes, sol::bases<Object>()
+    );
+    lua.create_named_table("input",
+        "keyPressed",   &keyPressed,
+        "keyHeld",      &keyHeld,
+        "keyReleased",  &keyReleased,
+        "mousePressed",  &mouseButtonPressed,
+        "mouseHeld",     &mouseButtonHeld,
+        "mouseReleased", &mouseButtonReleased,
+        "mouseDX", &mouseDX,
+        "mouseDY", &mouseDY
+    );
+    lua.create_named_table("key",
+        "Q", GLFW_KEY_Q,
+        "W", GLFW_KEY_W,
+        "E", GLFW_KEY_E,
+        "R", GLFW_KEY_R,
+        "T", GLFW_KEY_T,
+        "Y", GLFW_KEY_Y,
+        "U", GLFW_KEY_U,
+        "A", GLFW_KEY_A,
+        "S", GLFW_KEY_S,
+        "D", GLFW_KEY_D,
+        "SPACE",  GLFW_KEY_SPACE,
+        "LSHIFT", GLFW_KEY_LEFT_SHIFT,
+        "ESCAPE", GLFW_KEY_ESCAPE
+    );
+    lua.create_named_table("mouse",
+        "LEFT",  GLFW_MOUSE_BUTTON_LEFT,
+        "RIGHT", GLFW_MOUSE_BUTTON_RIGHT
+    );
+    sol::table find = lua.create_named_table("find");
+    find.set_function("obj", [](const std::string& name) {
+        Object* obj = findObject(name, rootObjs);
+        return objectToLua(obj);
+    });
+    find.set_function("ui", [](const std::string& name) {
+        UIElement* ui = findUIElement(name, uiRoots);
+        return uiToLua(ui);
+    });
+    sol::table raycast = lua.create_named_table("raycast");
+    raycast.set_function("occluded", [](const glm::vec3& origin, const glm::vec3& dir, float maxDist) {
+        return rayOccluded(origin, dir, maxDist, rootNode);
+    });
+    lua.set_function(
+        "swapScene", [](const std::string& path) { pendingScene = path; }
+    );
+    lua.set_function(
+        "playSound", [](const std::string& path, float vol) { playSound2D(path.c_str(), vol); }
+    );
+    lua.set_function(
+        "setMasterVolume", [](float vol) { setMasterVolume(vol); }
+    );
+    lua.set_function(
+        "quit", []() { glfwSetWindowShouldClose(window, true); }
+    );
+}
+
+void resetScripting()
+{
+    scripts.clear();
+    lua = sol::state{};
+    registerLuaAPI();
+}
+
+void loadScripts()
+{
+    for (ScriptInstance& si : scripts)
+    {
+        std::ifstream file(si.path);
+        if (!file) {
+            std::cout << "Error opening lua file" << '\n';
+            continue;
+        }
+
+        std::string source{
+            std::istreambuf_iterator<char>(file),
+            std::istreambuf_iterator<char>()
+        };
+
+        sol::environment env(lua, sol::create, lua.globals());
+        si.env = env;
+
+        if (si.obj) {
+            if (Capsule* capsule = dynamic_cast<Capsule*>(si.obj))
+                si.env["self"] = capsule;
+            else if (Camera* camera = dynamic_cast<Camera*>(si.obj))
+                si.env["self"] = camera;
+            else if (AudioSource* audiosource = dynamic_cast<AudioSource*>(si.obj))
+                si.env["self"] = audiosource;
+            else if (AnimatedObj* animatedObj = dynamic_cast<AnimatedObj*>(si.obj))
+                si.env["self"] = animatedObj;
+            else if (AnimatedMesh* animatedMesh = dynamic_cast<AnimatedMesh*>(si.obj))
+                si.env["self"] = animatedMesh;
+            else if (StaticMesh* staticMesh = dynamic_cast<StaticMesh*>(si.obj))
+                si.env["self"] = staticMesh;
+            else if (Mesh* mesh = dynamic_cast<Mesh*>(si.obj))
+                si.env["self"] = mesh;
+            else
+                si.env["self"] = si.obj;
+        }
+
+        sol::load_result loaded = lua.load(source, si.path);
+        if (!loaded.valid()) {
+            sol::error err = loaded;
+            std::cout << "Script load error: " << err.what() << '\n';
+            continue;
+        }
+        sol::protected_function body = loaded;
+        si.env.set_on(body);
+
+        auto result = body();
+
+        if (!result.valid()) {
+            sol::error err = result;
+            std::cout << "Script body error: " << err.what() << '\n';
+            continue;
+        }
+
+        si.startFn = si.env["start"];
+        if (!si.startFn.valid())
+            std::cout << "Start function invalid" << '\n';
+        si.updateFn = si.env["update"];
+        if (!si.updateFn.valid())
+            std::cout << "Update function invalid" << '\n';
+    }
+}
+
+void ScriptInstance::Start() const
+{
+    if (!startFn.valid()) return;
+
+    auto result = startFn();
+
+    if (!result.valid()) {
+        sol::error err = result;
+        std::cout << "Start function error: " << err.what() << '\n';
+    }
+}
+
+void ScriptInstance::Update(float deltaTime) const
+{
+    if (!updateFn.valid()) return;
+ 
+    auto result = updateFn(deltaTime);
+
+    if (!result.valid()) {
+        sol::error err = result;
+        std::cout << "Update function error: " << err.what() << '\n';
+    }
+}
+
+void initScripting()
+{
+    registerLuaAPI();
+    loadScripts();
+}
+
+void startScripts()
+{
+    for (const ScriptInstance& si : scripts) si.Start();
+}
+
+void updateScripts()
+{
+    for (const ScriptInstance& si : scripts) si.Update(deltaTime);
+}

@@ -1,0 +1,181 @@
+{
+    "objects": [
+        {
+            "name": "test",
+            "type": "staticmesh",
+            "tag": "",
+            "scripts": [],
+            "transform": [
+                0.0, 0.0, 0.0,
+                0.0, 0.0, 0.0,
+                1.0, 1.0, 1.0
+            ],
+            "meshpath": "assets/objects/testing_zone/testing_zone.obj",
+            "texpath": "assets/objects/testing_zone/testing_zone.png",
+            "pixelated": true,
+            "collides": true,
+            "parentbonename": "",
+            "children": []
+        },
+        {
+            "name": "test sound",
+            "type": "audiosource",
+            "tag": "",
+            "scripts": [
+                "assets/scripts/sound.lua"
+            ],
+            "transform": [
+                0.0, 0.0, 0.0,
+                0.0, 0.0, 0.0,
+                1.0, 1.0, 1.0
+            ],
+            "soundpath": "assets/sounds/test.wav",
+            "volume": 1.0,
+            "maxDistance": 30.0,
+            "falloff": 5.0,
+            "loop": true,
+            "parentbonename": "",
+            "children": []
+        },
+        {
+            "name": "player",
+            "type": "capsule",
+            "tag": "",
+            "scripts": [
+                "assets/scripts/player.lua"
+            ],
+            "transform": [
+                0.0, 5.0, 0.0,
+                0.0, 0.0, 0.0,
+                1.0, 1.0, 1.0
+            ],
+            "height": 1.8,
+            "radius": 0.3,
+            "parentbonename": "",
+            "children": [
+                {
+                    "name": "camnhands",
+                    "type": "animatedobj",
+                    "tag": "",
+                    "scripts": [],
+                    "transform": [
+                        0.0, 1.5, 0.0,
+                        0.0, 0.0, 0.0,
+                        1.0, 1.0, 1.0
+                    ],
+                    "armaturepath": "assets/objects/glock/camhandsmovement.fbx",
+                    "parentbonename": "",
+                    "children": [
+                        {
+                            "name": "camera",
+                            "type": "camera",
+                            "tag": "",
+                            "scripts": [],
+                            "fov": 90,
+                            "isCurrent": true,
+                            "transform": [
+                                0.0, 0.0, 0.0,
+                                0.0, 0.0, 0.0,
+                                1.0, 1.0, 1.0
+                            ],
+                            "parentbonename": "cam",
+                            "children": []
+                        },
+                        {
+                            "name": "glock",
+                            "type": "animatedmesh",
+                            "tag": "",
+                            "scripts": [
+                                "assets/scripts/glock.lua"
+                            ],
+                            "transform": [
+                                0.0, 0.0, 0.0,
+                                180.0, 0.0, 0.0,
+                                0.01, 0.01, 0.01
+                            ],
+                            "meshpath": "assets/objects/glock/glocknhands.fbx",
+                            "texpath": "assets/objects/glock/glocknhands.png",
+                            "pixelated": true,
+                            "parentbonename": "hands",
+                            "children": []
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "testcam",
+            "type": "camera",
+            "tag": "",
+            "scripts": [],
+            "fov": 90,
+            "isCurrent": false,
+            "transform": [
+                0.0, 10.0, 0.0,
+                90.0, -90.0, 0.0,
+                1.0, 1.0, 1.0
+            ],
+            "parentbonename": "",
+            "children": []
+        }
+    ],
+    "lights": [
+        {
+            "name": "light1",
+            "type": "point",
+            "tag": "",
+            "pos": [0.0, 4.0, 0.0],
+            "color": [1.0, 1.0, 1.0],
+            "intensity": 80.0,
+            "radius": 40.0,
+            "falloff": 0.4
+        },
+        {
+            "name": "light2",
+            "type": "line",
+            "tag": "",
+            "start": [-11.0, 2.0, 3.0],
+            "end": [11.0, 2.0, 3.0],
+            "segments": 24,
+            "color": [1.0, 0.0, 0.0],
+            "intensity": 10.0,
+            "radius": 30.0,
+            "falloff": 1.0
+        }
+    ],
+    "fonts": [
+        {
+            "ttfpath": "assets/ui/fonts/terminal.ttf",
+            "pixelheight": 32.0
+        }
+    ],
+    "ui": [
+        {
+            "name": "crosshair",
+            "type": "uiimage",
+            "tag": "",
+            "uitransform": [0.5, 0.5, 0.0, 1.0, 1.0],
+            "imagepath": "assets/ui/crosshair.png",
+            "children": []
+        },
+        {
+            "name": "fps",
+            "type": "uitext",
+            "tag": "",
+            "uitransform": [0.01, 0.01, 0.0, 1.0, 1.0],
+            "text": "",
+            "size": 32.0,
+            "fontindex": 0,
+            "color": [1.0, 1.0, 1.0],
+            "anchorX": "l",
+            "anchorY": "t",
+            "children": []
+        }
+    ],
+    "globalscripts": [
+        "assets/scripts/fps.lua",
+        "assets/scripts/cameras.lua"
+    ],
+    "ambient": 0.4,
+    "lightmapResScalar": 0.1
+}

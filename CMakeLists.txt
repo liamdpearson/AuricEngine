@@ -1,0 +1,79 @@
+cmake_minimum_required(VERSION 3.16)
+project(game_engine LANGUAGES C CXX)
+
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_CXX_USE_RESPONSE_FILE_FOR_INCLUDES OFF)
+
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif()
+
+# --- third party: built without our warning flags ---
+add_library(third_party STATIC
+    third_party/glad/src/glad.c
+    third_party/xatlas/xatlas.cpp
+    third_party/ufbx/ufbx.c
+    third_party/miniaudio/miniaudio.c
+)
+target_include_directories(third_party SYSTEM PUBLIC
+    ${CMAKE_SOURCE_DIR}/third_party
+    ${CMAKE_SOURCE_DIR}/third_party/glad/include
+    ${CMAKE_SOURCE_DIR}/third_party/glfw/include
+)
+
+# --- lua ---
+add_library(lua STATIC third_party/lua/onelua.c)
+target_compile_definitions(lua PRIVATE MAKE_LIB)
+target_include_directories(lua PUBLIC ${CMAKE_SOURCE_DIR}/third_party/lua)
+
+# --- prebuilt GLFW ---
+add_library(glfw3 STATIC IMPORTED)
+
+if (WIN32)
+	set_target_properties( glfw3 PROPERTIES
+        IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/third_party/glfw/lib/windows/libglfw3.a
+	)
+
+elseif (UNIX)
+	set_target_properties( glfw3 PROPERTIES
+        IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/third_party/glfw/lib/linux/libglfw3.a
+	)
+
+endif()
+    
+# --- engine ---
+add_library(engine STATIC
+    engine/src/audio.cpp
+    engine/src/collisions.cpp
+    engine/src/graphics.cpp
+    engine/src/input.cpp
+    engine/src/lighting.cpp
+    engine/src/load.cpp
+    engine/src/raycast.cpp
+    engine/src/scenes.cpp
+    engine/src/scripts.cpp
+    engine/src/ui.cpp
+)
+target_include_directories(engine PUBLIC ${CMAKE_SOURCE_DIR}/engine)
+target_compile_options(engine PRIVATE -Wall -Wextra)
+
+if (WIN32)
+	target_link_libraries(engine PUBLIC third_party glfw3 lua opengl32 gdi32)
+
+elseif (UNIX)
+	target_link_libraries(engine PUBLIC third_party glfw3 lua GL)
+
+endif()
+
+# --- game ---
+add_executable(app engine/main.cpp)
+target_compile_options(app PRIVATE -Wall -Wextra)
+target_link_libraries(app PRIVATE engine)
+set_target_properties(app PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}
+    OUTPUT_NAME $<IF:$<CONFIG:RelWithDebInfo>,reldbg,release>
+)
