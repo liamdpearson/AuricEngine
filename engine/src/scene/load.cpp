@@ -1,20 +1,21 @@
 #include "include/scene/load.h"
 
+#include <memory>
 #include <nlohmann/json.hpp>
-#include "../include/load.h"
-#include "../include/ui.h"
-#include "../include/scripts.h"
-#include "../include/lighting.h"
-#include "../include/graphics.h"
-#include "../include/collisions.h"
-#include "../include/audio.h"
+
 #include <fstream>
-#include <vector>
 #include <string>
 #include <iostream>
 
+#include "include/scene/object.h"
+
 
 using json = nlohmann::json;
+
+static std::unique_ptr<Component> buildComponent(const json& node, Object* owner)
+{
+
+}
 
 static std::unique_ptr<Object> buildObject(const json& node, Object* parent)
 {
@@ -28,8 +29,12 @@ static std::unique_ptr<Object> buildObject(const json& node, Object* parent)
                         t.at(3).get<float>(), t.at(4).get<float>(), t.at(5).get<float>(),
                         t.at(6).get<float>(), t.at(7).get<float>(), t.at(8).get<float>()};
     int pbi = -1;
-    if (parent && parent->GetRig() && pbn != "")
-        pbi = parent->GetRig()->findBoneIndex(pbn);
+    if (parent && pbn != "") {
+        RigComponent* rig = parent->getComponent<RigComponent>();
+        if (rig) {
+            pbi = rig->rig.findBoneIndex(pbn); 
+        }
+    }
     
     std::unique_ptr<Object> obj;
 

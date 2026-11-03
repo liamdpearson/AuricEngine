@@ -126,8 +126,8 @@ class Object
         std::string getTag() const { return this->tag; }
 
         void addChild(std::unique_ptr<Object> child, int bi = -1) {
-            if (bi != -1)
-                std::cout << "Warning: Added bone index when adding child to non animated mesh." << '\n';
+            if (bi > -1)
+                child->boneIndex = bi;
             child->parent = this;
             this->children.push_back(std::move(child));
         }
