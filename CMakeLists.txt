@@ -47,16 +47,20 @@ endif()
     
 # --- engine ---
 add_library(engine STATIC
-    engine/src/audio.cpp
-    engine/src/collisions.cpp
-    engine/src/graphics.cpp
-    engine/src/input.cpp
-    engine/src/lighting.cpp
-    engine/src/load.cpp
-    engine/src/raycast.cpp
-    engine/src/scenes.cpp
-    engine/src/scripts.cpp
-    engine/src/ui.cpp
+    engine/src/assets/assets.cpp
+    engine/src/assets/lightmap.cpp
+    engine/src/assets/mesh.cpp
+    engine/src/core/audio.cpp
+    engine/src/core/collisions.cpp
+    engine/src/core/input.cpp
+    engine/src/core/lighting.cpp
+    engine/src/core/raycast.cpp
+    engine/src/render/graphics.cpp
+    engine/src/render/window.cpp
+    engine/src/scene/load.cpp
+    engine/src/scene/object.cpp
+    engine/src/scripting/scripts.cpp
+    engine/src/ui/ui.cpp
 )
 target_include_directories(engine PUBLIC ${CMAKE_SOURCE_DIR}/engine)
 target_compile_options(engine PRIVATE -Wall -Wextra)

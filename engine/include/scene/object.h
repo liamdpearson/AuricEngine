@@ -24,47 +24,6 @@ struct Component
     virtual ~Component() = default;
 };
 
-// A node in the scene hierarchy
-class Object
-{
-    private:
-        glm::mat4 world = glm::mat4(1.0f);
-        int boneIndex = -1; // -1 unless object is a child of a bone in an armature
-        std::string name, tag;
-        std::vector<std::unique_ptr<Component>> components;
-
-    public:
-        bool draw = true;
-        Transform transform;
-        std::vector<std::unique_ptr<Object>> children;
-        Object* parent = nullptr; // nullptr if root, points too parent object
-        
-        Object() = default;
-        Object(const Transform& t)
-            : transform(t) {}
-
-        void setWorld(const glm::mat4& world) { this->world = world; }
-        glm::mat4 getWorld() const  { return this->world; }
-
-        void setBoneIndex(int bi) { this->boneIndex = bi; }
-        int getBoneIndex() const { return this->boneIndex; }
-
-        void setName(std::string n) { this->name = n; }
-        std::string getName() const { return this->name; }
-
-        void setTag(std::string t) { this->tag = t; }
-        std::string getTag() const { return this->tag; }
-
-        virtual void addChild(std::unique_ptr<Object> child, int bi = -1) {
-            if (bi != -1)
-                std::cout << "Warning: Added bone index when adding child to non animated mesh." << '\n';
-            child->parent = this;
-            this->children.push_back(std::move(child));
-        }
-
-        virtual ~Object() = default;
-};
-
 struct MeshComponent : Component 
 {
     std::vector<float> vertices;
@@ -123,8 +82,58 @@ struct AudioSourceComponent : Component
     ~AudioSourceComponent() override;
 };
 
-// just declared here full implementation will be elsewhere
-struct ScriptComponent : Component {};
+struct ScriptComponent : Component
+{
+    std::string path;
+};
+
+// A node in the scene hierarchy
+class Object
+{
+    private:
+        glm::mat4 world = glm::mat4(1.0f);
+        int boneIndex = -1; // -1 unless object is a child of a bone in an armature
+        std::string name, tag;
+        std::vector<std::unique_ptr<Component>> components;
+
+    public:
+        bool draw = true;
+        Transform transform;
+        std::vector<std::unique_ptr<Object>> children;
+        Object* parent = nullptr; // nullptr if root, points too parent object
+        
+        Object() = default;
+        Object(const Transform& t)
+            : transform(t) {}
+
+        template <typename T>
+        T* getComponent() const {
+            for (auto& c : components)
+                if (T* t = dynamic_cast<T*>(c.get())) return t;
+            return nullptr;
+        }
+
+        void setWorld(const glm::mat4& world) { this->world = world; }
+        glm::mat4 getWorld() const  { return this->world; }
+
+        void setBoneIndex(int bi) { this->boneIndex = bi; }
+        int getBoneIndex() const { return this->boneIndex; }
+
+        void setName(std::string n) { this->name = n; }
+        std::string getName() const { return this->name; }
+
+        void setTag(std::string t) { this->tag = t; }
+        std::string getTag() const { return this->tag; }
+
+        void addChild(std::unique_ptr<Object> child, int bi = -1) {
+            if (bi != -1)
+                std::cout << "Warning: Added bone index when adding child to non animated mesh." << '\n';
+            child->parent = this;
+            this->children.push_back(std::move(child));
+        }
+
+        ~Object() = default;
+};
 
 Object* findObject(const std::string& name,
                    const std::vector<std::unique_ptr<Object>>& objs);

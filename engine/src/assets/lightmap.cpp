@@ -5,7 +5,6 @@
 
 #include "include/core/constants.h"
 
-using namespace Wayback3D;
 
 
 // loops through mesh tris and adds up area
@@ -19,7 +18,7 @@ float getMeshArea(const std::vector<float>& verts,
         glm::vec3 pos[3];
         for (int c = 0; c < 3; ++c)
         {
-            size_t v = (size_t)idx[i + c] * Constants::VERTEX_FLOATS;
+            size_t v = (size_t)idx[i + c] * Auric::Constants::VERTEX_FLOATS;
             pos[c] = glm::vec3(verts[v], verts[v + 1], verts[v + 2]);
         }
         area += 0.5f * glm::length(glm::cross(pos[2] - pos[0], pos[1] - pos[0]));

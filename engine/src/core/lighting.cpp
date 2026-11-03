@@ -1,7 +1,4 @@
-#include "../include/lighting.h"
-
-#include "../include/graphics.h"
-#include "../include/raycast.h"
+#include "/include/core/lighting.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -11,7 +8,6 @@
 #include <vector>
 #include <iostream>
 #include <algorithm>
-#include <memory>
 #include <utility>
 
 

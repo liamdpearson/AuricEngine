@@ -1,57 +1,113 @@
+#include "include/assets/assets.h"
+
+#include <cassert>
 #include <glm/glm.hpp>                  // vec3, mat4, basic types
+#include <memory>
+#include <utility>
 #include <xatlas/xatlas.h>
 #include <ufbx/ufbx.h>
 #include <vector>
 #include <string>
 #include <iostream>
 
+#include "include/render/graphics.h"
+#include "include/core/lighting.h"
 #include "include/scene/object.h"
+#include "include/assets/mesh.h"
+#include "include/assets/lightmap.h"
+#include "include/types/animation.h"
 
 
+namespace Auric::Assets {
 
-namespace Wayback3D::Assets {
-    std::pair<std::unique_ptr<MeshComponent>, std::unique_ptr<RigComponent>> makeMesh(const char* objSrc,
-                                                                                               const char* texSrc,
-                                                                                               bool pixelated);
-    std::unique_ptr<MeshComponent> makeCamera(float FOV);
-
-    std::unique_ptr<RigComponent> makeRig(const char* path);
-
-    std::unique_ptr<LightMapComponent> makeLightMap();
-
-    std::unique_ptr<ColliderComponent> makeCollider();
-
-    std::unique_ptr<CapsuleColliderComponent> makeCapsuleCollider(float radius, float height);
-
-    std::unique_ptr<AudioSourceComponent> makeAudioSource(const char* path, float volume,
-                                                          float maxDistance, float falloff, bool loop);
-
-    std::unique_ptr<ScriptComponent> makeScript(const std::string path);
-}
-
-std::unique_ptr<StaticMesh> makeStaticMesh(const Transform& transform, const char* objPath,
-                          const char* texPath, bool pixelated, bool collides)
-{   
-    auto obj = std::make_unique<StaticMesh>();
+std::pair<std::unique_ptr<MeshComponent>, std::unique_ptr<RigComponent>> makeMesh(const char* objSrc,
+                                                                                           const char* texSrc,
+                                                                                           bool pixelated)
+{
+    auto mesh = std::make_unique<MeshComponent>();
 
     std::vector<float> verts;
     std::vector<unsigned int> idx;
+    Skeleton skel;
+    std::vector<Animation> anims;
 
-    const char* file = strrchr(objPath, '.');
+    const char* file = strrchr(objSrc, '.');
     if (file) {
-        if (strcmp(file, ".obj") == 0) {
-            loadObj(objPath, verts, idx);
-        }
-        else if (strcmp(file, ".fbx") == 0) {
-            loadFbxUnanimated(objPath, verts, idx);
+        if (strcmp(file, ".fbx") == 0) {
+            loadFbx(objSrc, verts, idx, skel, anims);
         }
         else {
-            std::cout << "File not recognized: " << objPath << '\n';
+            std::cout << "File type not recognized: " << objSrc << '\n';
         }
     } else {
-        std::cout << "No file type: " << objPath << '\n';
+        std::cout << "No file type: " << objSrc << '\n';
     }
-    
+
+    mesh->vertices = verts;
+    mesh->indices  = idx;
+    mesh->texture  = loadTexture(texSrc, pixelated);
+    mesh->indexCount = (GLsizei)idx.size();
+
+    if (skel.inverseBind.size() > 0) {
+        auto rig  = std::make_unique<RigComponent>();
+
+        Rig rigObj;
+        rigObj.skeleton = skel;
+        rigObj.animations = anims;
+
+        rig->rig = rigObj;
+
+        return std::make_pair(std::move(mesh), std::move(rig));
+    } else {
+        return std::make_pair(std::move(mesh), nullptr);
+    }
+}
+
+std::unique_ptr<CameraComponent> makeCamera(float FOV)
+{
+    auto cam = std::make_unique<CameraComponent>();
+
+    cam->FOV = FOV;
+
+    return cam;
+}
+
+std::unique_ptr<RigComponent> makeRig(const char* path)
+{
+    auto rig = std::make_unique<RigComponent>();
+
+    Skeleton skel;
+    std::vector<Animation> anims;
+
+    const char* file = strrchr(path, '.');
+    if (file) {
+        if (strcmp(file, ".fbx") == 0) {
+            loadFbxRig(path, skel, anims);
+        }
+        else {
+            std::cout << "File type not recognized: " << path << '\n';
+        }
+    } else {
+        std::cout << "No file type: " << path << '\n';
+    }
+
+    Rig rigObj;
+
+    rigObj.skeleton = skel;
+    rigObj.animations = anims;
+
+    rig->rig = rigObj;
+
+    return rig;
+}
+
+std::unique_ptr<LightMapComponent> makeLightMap(const Transform& transform, MeshComponent* mesh)
+{
+    auto lm = std::make_unique<LightMapComponent>();
+
+    std::vector<float> verts = mesh->vertices;
+    std::vector<unsigned int> idx = mesh->indices;
+
     xatlas::Atlas* atlas = nullptr;
     float ogArea = getMeshArea(verts, idx);
     float scaledArea = (transform.scaleX * transform.scaleY +
@@ -59,201 +115,50 @@ std::unique_ptr<StaticMesh> makeStaticMesh(const Transform& transform, const cha
                         transform.scaleY * transform.scaleZ) * ogArea;
     float resolution = std::sqrt(scaledArea * 64 * 64) * lightmapResScalar;
     if (!GenUV2(atlas, verts, idx, resolution)) atlas = nullptr;
-    
 
-    obj->transform = transform;
-    obj->setVertices(verts);
-    obj->setIndices(idx);
-    obj->setTexture(loadTexture(texPath, pixelated));
-    obj->setIndexCount((GLsizei)idx.size());
+    lm->atlas = atlas;
 
-    obj->setAtlas(atlas);
-    obj->setCollides(collides);
-    
-    return obj;
+    return lm;
 }
 
-std::unique_ptr<Mesh> makeMesh(const Transform& transform, const char* objPath,
-              const char* texPath, bool pixelated)
+std::unique_ptr<ColliderComponent> makeCollider()
 {
-    auto obj = std::make_unique<Mesh>();
+    auto collider = std::make_unique<ColliderComponent>();
 
-    std::vector<float> verts;
-    std::vector<unsigned int> idx;
-
-    const char* file = strrchr(objPath, '.');
-    if (file) {
-        if (strcmp(file, ".obj") == 0) {
-            loadObj(objPath, verts, idx);
-        }
-        else if (strcmp(file, ".fbx") == 0) {
-            loadFbxUnanimated(objPath, verts, idx);
-        }
-        else {
-            std::cout << "File not recognized: " << objPath << '\n';
-        }
-    } else {
-        std::cout << "No file type: " << objPath << '\n';
-    }
-
-    obj->transform = transform;
-    obj->setVertices(verts);
-    obj->setIndices(idx);
-    obj->setTexture(loadTexture(texPath, pixelated));
-    obj->setIndexCount((GLsizei)idx.size());
-
-    return obj;
+    return collider;
 }
 
-std::unique_ptr<AnimatedMesh> makeAnimatedMesh(const Transform& transform, const char* objPath,
-                              const char* texPath, bool pixelated)
+std::unique_ptr<CapsuleColliderComponent> makeCapsuleCollider(float radius = 0.3f, float height = 1.8f)
 {
-    auto obj = std::make_unique<AnimatedMesh>();
+    auto capsuleCol = std::make_unique<CapsuleColliderComponent>();
 
-    std::vector<float> verts;
-    std::vector<unsigned int> idx;
-    Skeleton skel;
-    std::vector<Animation> anims;
+    capsuleCol->height = height;
+    capsuleCol->radius = radius;
 
-    const char* file = strrchr(objPath, '.');
-    if (file) {
-        if (strcmp(file, ".fbx") == 0) {
-            loadFbxAnimatedMesh(objPath, verts, idx, skel, anims);
-        }
-        else {
-            std::cout << "File type not recognized: " << objPath << '\n';
-        }
-    } else {
-        std::cout << "No file type: " << objPath << '\n';
-    }
-    
-    Rig rig;
-
-    obj->transform = transform;
-    obj->setVertices(verts);
-    obj->setIndices(idx);
-    obj->setTexture(loadTexture(texPath, pixelated));
-    obj->setIndexCount((GLsizei)idx.size());
-
-    rig.skeleton = skel;
-    rig.animations = anims;
-
-    obj->rig = rig;
-
-    return obj;
+    return capsuleCol;
 }
 
-std::unique_ptr<AnimatedObj> makeAnimatedObj(const Transform& transform, const char* objPath)
+std::unique_ptr<AudioSourceComponent> makeAudioSource(const char* path, float volume,
+                                                      float maxDistance, float falloff, bool loop)
 {
-    auto obj = std::make_unique<AnimatedObj>();
+    auto audioSource = std::make_unique<AudioSourceComponent>();
 
-    Skeleton skel;
-    std::vector<Animation> anims;
+    audioSource->path = path;
+    audioSource->volume = volume;
+    audioSource->maxDistance = maxDistance;
+    audioSource->falloff = falloff;
+    audioSource->loop = loop;
 
-    const char* file = strrchr(objPath, '.');
-    if (file) {
-        if (strcmp(file, ".fbx") == 0) {
-            loadFbxAnimatedObj(objPath, skel, anims);
-        }
-        else {
-            std::cout << "File type not recognized: " << objPath << '\n';
-        }
-    } else {
-        std::cout << "No file type: " << objPath << '\n';
-    }
-    
-    Rig rig;
-    obj->transform = transform;
-    rig.skeleton = skel;
-    rig.animations = anims;
-
-    obj->rig = rig;
-
-    return obj;
+    return audioSource;
 }
 
-std::unique_ptr<AudioSource> makeAudioSource(const Transform& transform, const std::string& path,
-                                             float volume, float maxDistance, float falloff, bool loop)
+std::unique_ptr<ScriptComponent> makeScript(const std::string path)
 {
-    auto obj = std::make_unique<AudioSource>();
-    
-    obj->transform = transform;
-    obj->volume = volume;
-    obj->maxDistance = maxDistance;
-    obj->falloff = falloff;
-    obj->setLoop(loop);
-    obj->setPath(path);
+    auto script = std::make_unique<ScriptComponent>();
 
-    return obj;
+    script->path = path;
+    
+    return script;
 }
 
-
-
-
-// loads .fbx file unanimated
-// void loadFbxUnanimated(const char* path, std::vector<float>& outVerts,
-//                        std::vector<unsigned int>& outIndices)
-// {
-//     ufbx_load_opts opts = {}; // default options
-//     opts.target_axes = ufbx_axes_right_handed_y_up;
-//     opts.target_unit_meters = 1.0f;
-//
-//     ufbx_error error;
-//     ufbx_scene* scene = ufbx_load_file(path, &opts, &error);
-//     if (!scene)
-//     {
-//         std::cout << "Failed to load scene. Path: " << path 
-//                   << " Description: " << error.description.data << '\n';
-//         ufbx_free_scene(scene);
-//         return;
-//     }
-//
-//     for (size_t i = 0; i < scene->nodes.count; ++i)
-//     {
-//         ufbx_node* node = scene->nodes.data[i];
-//         ufbx_mesh* mesh = node->mesh;
-//         if (!mesh) continue;
-//
-//         ufbx_matrix geomToWorld = node->geometry_to_world;
-//         ufbx_matrix geomToWorldNormals = ufbx_matrix_for_normals(&geomToWorld);
-//         std::vector<unsigned int> tri(mesh->max_face_triangles * 3);
-//
-//         for (size_t fi = 0; fi < mesh->faces.count; ++fi)
-//         {
-//             ufbx_face face = mesh->faces[fi];
-//             size_t numTris = ufbx_triangulate_face(tri.data(), tri.size(), mesh, face);
-//
-//             for (size_t i = 0; i < numTris * 3; ++i)
-//             {
-//                 unsigned int corner = tri[i];
-//                 ufbx_vec3 p = ufbx_get_vertex_vec3(&mesh->vertex_position, corner);
-//                 p = ufbx_transform_position(&geomToWorld, p);
-//                 ufbx_vec2 uv = mesh->vertex_uv.exists
-//                     ? ufbx_get_vertex_vec2(&mesh->vertex_uv, corner)
-//                     : ufbx_vec2{0.0f, 0.0f};
-//                 ufbx_vec3 n = mesh->vertex_normal.exists
-//                     ? ufbx_get_vertex_vec3(&mesh->vertex_normal, corner)
-//                     : ufbx_vec3{0.0f, 0.0f, 1.0f};
-//                 n = ufbx_transform_direction(&geomToWorldNormals, n);
-//
-//                 outIndices.push_back((unsigned int)(outVerts.size() / VERTEX_FLOATS));
-//                 outVerts.push_back((float)p.x);
-//                 outVerts.push_back((float)p.y);
-//                 outVerts.push_back((float)p.z);
-//                 outVerts.push_back((float)uv.x);
-//                 outVerts.push_back((float)uv.y);
-//                 outVerts.push_back((float)n.x);
-//                 outVerts.push_back((float)n.y);
-//                 outVerts.push_back((float)n.z);
-//                 outVerts.push_back(0.0f); // light map uv
-//                 outVerts.push_back(0.0f);
-//                 outVerts.push_back(0.0f); // empty anim data
-//                 outVerts.push_back(0.0f);
-//                 outVerts.push_back(0.0f);
-//                 outVerts.push_back(0.0f);
-//                 outVerts.push_back(0.0f);
-//             }
-//         }
-//     }
-//     ufbx_free_scene(scene);
-// }
+}

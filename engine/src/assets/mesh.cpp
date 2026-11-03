@@ -10,8 +10,6 @@
 #include "include/types/animation.h"
 #include "include/core/constants.h"
 
-using namespace Wayback3D;
-
 
 // loads .obj file
 void loadObj(const char* path, std::vector<float>& outVerts,
@@ -69,7 +67,7 @@ void loadObj(const char* path, std::vector<float>& outVerts,
                 if (found != uniqueMap.end()) {
                     face.push_back(found->second);
                 } else {
-                    unsigned int newIdx = (unsigned int)(outVerts.size() / Constants::VERTEX_FLOATS);
+                    unsigned int newIdx = (unsigned int)(outVerts.size() / Auric::Constants::VERTEX_FLOATS);
                     // pos
                     outVerts.push_back(pos[posIdx].x);
                     outVerts.push_back(pos[posIdx].y);
@@ -239,7 +237,7 @@ void loadFbx(const char* path, std::vector<float>& outVerts,
                     if (sum != 1.0f && sum > 0.0f) for (int w = 0; w < 4; ++w) bw[w] /= sum;
                 }
 
-                outIndices.push_back((unsigned int)(outVerts.size() / Constants::VERTEX_FLOATS));
+                outIndices.push_back((unsigned int)(outVerts.size() / Auric::Constants::VERTEX_FLOATS));
                 outVerts.push_back((float)p.x);
                 outVerts.push_back((float)p.y);
                 outVerts.push_back((float)p.z);
