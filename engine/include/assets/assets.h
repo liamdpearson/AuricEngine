@@ -15,7 +15,7 @@ std::unique_ptr<CameraComponent> makeCamera(float FOV);
 
 std::unique_ptr<RigComponent> makeRig(const char* path);
 
-std::unique_ptr<LightMapComponent> makeLightMap(MeshComponent* mesh);
+std::unique_ptr<LightMapComponent> makeLightMap();
 
 std::unique_ptr<ColliderComponent> makeCollider();
 

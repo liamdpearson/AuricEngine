@@ -10,16 +10,16 @@
             ],
             "components": [
                 {
-                    "type": "mesh",
+                    "ID": 1,
                     "meshpath": "assets/objects/testing_zone/testing_zone.obj",
                     "texpath": "assets/objects/testing_zone/testing_zone.png",
                     "pixelated": true
                 },
                 {
-                    "type": "collider"
+                    "ID": "5"
                 },
                 {
-                    "type": "lightmap"
+                    "ID": "4"
                 }
             ],
             "parentbonename": "",
@@ -35,14 +35,14 @@
             ],
             "components": [
                 {
-                    "type": "audiosource",
+                    "ID": 7,
                     "volume": 1.0,
                     "maxDistance": 30.0,
                     "falloff": 5.0,
                     "loop": true
                 },
                 {
-                    "type": "script",
+                    "ID": 8,
                     "path": "assets/scripts/player.lua"
                 }
             ],
@@ -59,12 +59,12 @@
             ],
             "components": [
                 {
-                    "type": "capsulecollider",
+                    "ID": 6,
                     "radius": 0.3,
                     "height": 1.8
                 },
                 {
-                    "type": "script",
+                    "ID": 8,
                     "path": "assets/scripts/player.lua"
                 }
             ],
@@ -80,7 +80,7 @@
                     ],
                     "components": [
                         {
-                            "type": "rig",
+                            "ID": 3,
                             "path": "assets/objects/glock/camhandsmovement.fbx"
                         }
                     ],
@@ -96,7 +96,7 @@
                             ],
                             "components": [
                                 {
-                                    "type": "camera",
+                                    "ID": 2,
                                     "FOV": 90.0,
                                     "isCurrent": true
                                 }
@@ -114,13 +114,13 @@
                             ],
                             "components": [
                                 {
-                                    "type": "mesh",
+                                    "ID": 1,
                                     "meshpath": "assets/objects/glock/glocknhands.fbx",
                                     "texpath": "assets/objects/glock/glocknhands.png",
                                     "pixelated": true
                                 },
                                 {
-                                    "type": "script",
+                                    "ID": 8,
                                     "path": "assets/scripts/glock.lua"
                                 }
                             ],
@@ -141,7 +141,7 @@
             ],
             "components": [
                 {
-                    "type": "camera",
+                    "ID": 2,
                     "FOV": 90,
                     "isCurrent": false
                 }

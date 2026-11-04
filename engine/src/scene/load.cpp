@@ -4,9 +4,12 @@
 #include <nlohmann/json.hpp>
 
 #include <fstream>
+#include <sol/sol.hpp>
 #include <string>
 #include <iostream>
+#include "include/core/constants.h"
 
+#include "include/core/constants.h"
 #include "include/scene/object.h"
 #include "include/assets/assets.h"
 
@@ -15,7 +18,18 @@ using json = nlohmann::json;
 
 static std::unique_ptr<Component> buildComponent(const json& node, Object* owner)
 {
-    
+    const unsigned int typeID = node.value("ID", 0);
+
+    std::unique_ptr<Component> comp;
+
+    switch (typeID) {
+        case Auric::Constants::MESHID:
+            const std::string meshpath = node.value("meshpath", "");
+            const std::string texpath = node.value("texpath", "");
+            break;
+        case Auric::Constants::CAMERAID:
+            break;
+    }
 }
 
 static std::unique_ptr<Object> buildObject(const json& node, Object* parent)

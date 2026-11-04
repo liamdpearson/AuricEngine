@@ -11,10 +11,8 @@
 #include <iostream>
 
 #include "include/render/graphics.h"
-#include "include/core/lighting.h"
 #include "include/scene/object.h"
 #include "include/assets/mesh.h"
-#include "include/assets/lightmap.h"
 #include "include/types/animation.h"
 
 
@@ -101,22 +99,22 @@ std::unique_ptr<RigComponent> makeRig(const char* path)
     return rig;
 }
 
-std::unique_ptr<LightMapComponent> makeLightMap(const Transform& transform, MeshComponent* mesh)
+std::unique_ptr<LightMapComponent> makeLightMap()
 {
     auto lm = std::make_unique<LightMapComponent>();
 
-    std::vector<float> verts = mesh->vertices;
-    std::vector<unsigned int> idx = mesh->indices;
+    // std::vector<float> verts = mesh->vertices;
+    // std::vector<unsigned int> idx = mesh->indices;
+    
+    // xatlas::Atlas* atlas = nullptr;
+    // float ogArea = getMeshArea(verts, idx);
+    // float scaledArea = (transform.scaleX * transform.scaleY +
+    //                     transform.scaleX * transform.scaleZ +
+    //                     transform.scaleY * transform.scaleZ) * ogArea;
+    // float resolution = std::sqrt(scaledArea * 64 * 64) * lightmapResScalar;
+    // if (!GenUV2(atlas, verts, idx, resolution)) atlas = nullptr;
 
-    xatlas::Atlas* atlas = nullptr;
-    float ogArea = getMeshArea(verts, idx);
-    float scaledArea = (transform.scaleX * transform.scaleY +
-                        transform.scaleX * transform.scaleZ +
-                        transform.scaleY * transform.scaleZ) * ogArea;
-    float resolution = std::sqrt(scaledArea * 64 * 64) * lightmapResScalar;
-    if (!GenUV2(atlas, verts, idx, resolution)) atlas = nullptr;
-
-    lm->atlas = atlas;
+    // lm->atlas = atlas;
 
     return lm;
 }
