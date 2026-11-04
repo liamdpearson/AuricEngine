@@ -8,13 +8,14 @@
 #include <iostream>
 
 #include "include/scene/object.h"
+#include "include/assets/assets.h"
 
 
 using json = nlohmann::json;
 
 static std::unique_ptr<Component> buildComponent(const json& node, Object* owner)
 {
-
+    
 }
 
 static std::unique_ptr<Object> buildObject(const json& node, Object* parent)

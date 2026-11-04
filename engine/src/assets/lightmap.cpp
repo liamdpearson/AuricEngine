@@ -36,9 +36,9 @@ bool GenUV2(xatlas::Atlas*& atlas, std::vector<float>& verts,
     atlas = xatlas::Create();
 
     xatlas::MeshDecl meshDecl;
-    meshDecl.vertexCount = static_cast<uint32_t>(verts.size() / Constants::VERTEX_FLOATS);
+    meshDecl.vertexCount = static_cast<uint32_t>(verts.size() / Auric::Constants::VERTEX_FLOATS);
     meshDecl.vertexPositionData = verts.data();
-    meshDecl.vertexPositionStride = sizeof(float) * Constants::VERTEX_FLOATS;
+    meshDecl.vertexPositionStride = sizeof(float) * Auric::Constants::VERTEX_FLOATS;
 
     meshDecl.indexCount = static_cast<uint32_t>(idx.size());
     meshDecl.indexData = idx.data();
@@ -69,7 +69,7 @@ bool GenUV2(xatlas::Atlas*& atlas, std::vector<float>& verts,
     {
         const xatlas::Vertex& xatlasVert = outputMesh.vertexArray[i];
 
-        const uint32_t ogVertIdx = xatlasVert.xref * Constants::VERTEX_FLOATS;
+        const uint32_t ogVertIdx = xatlasVert.xref * Auric::Constants::VERTEX_FLOATS;
         //pos
         finalVerts.push_back(verts[ogVertIdx]);
         finalVerts.push_back(verts[ogVertIdx + 1]);
@@ -100,7 +100,7 @@ bool GenUV2(xatlas::Atlas*& atlas, std::vector<float>& verts,
     idx = finalIdx;
 
     std::cout << "Succesfully created second uv set. New vert count: "
-              << finalVerts.size() / Constants::VERTEX_FLOATS << '\n'
+              << finalVerts.size() / Auric::Constants::VERTEX_FLOATS << '\n'
               << "# of atlas islands: " << outputMesh.chartCount << '\n';
 
     return true;

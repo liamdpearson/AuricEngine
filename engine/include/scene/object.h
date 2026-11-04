@@ -7,12 +7,12 @@
 
 #include <xatlas/xatlas.h>
                        
+#include "include/core/constants.h"
 #include "include/types/primatives.h"
 #include "include/types/animation.h"
 
 #include <vector>
 #include <string>
-#include <iostream>
 #include <memory>
 
 
@@ -22,69 +22,7 @@ struct Component
 {
     Object* owner = nullptr;
     virtual ~Component() = default;
-};
-
-struct MeshComponent : Component 
-{
-    std::vector<float> vertices;
-    std::vector<unsigned int> indices;
-    unsigned int texture = 0;
-
-    GLsizei indexCount = 0;
-    unsigned int VAO = 0, VBO = 0, EBO = 0;
-
-    ~MeshComponent() override;
-};
-
-struct CameraComponent : Component
-{
-    glm::vec3 pos{0.0f, 0.0f, 0.0f};
-    glm::vec3 front{0.0f, 0.0f, -1.0f};
-    glm::vec3 up{0.0f, 1.0f, 0.0f};
-
-    float FOV;
-};
-
-struct RigComponent : Component
-{
-    Rig rig;
-};
-
-struct LightMapComponent : Component 
-{
-    unsigned int lightMap = 0;
-    xatlas::Atlas* atlas = nullptr;
-
-    ~LightMapComponent() override;
-};
-
-// just a boolean to tell collision code
-// to add the objects mesh to the colliders
-struct ColliderComponent : Component {};
-
-struct CapsuleColliderComponent : Component
-{
-    float height = 1.8f; // capsule height
-    float radius = 0.3f; // capsule width
-    glm::vec3 velocity{0.0f};
-};
-
-struct AudioSourceComponent : Component
-{
-    std::string path;
-    int index = -1;
-
-    bool loop = false;
-    float volume = 1.0f;
-    float maxDistance = 50.0f;
-    float falloff = 1.0f;
-
-    ~AudioSourceComponent() override;
-};
-
-struct ScriptComponent : Component
-{
-    std::string path;
+    static inline const unsigned int CID = 0;
 };
 
 // A node in the scene hierarchy
@@ -109,7 +47,10 @@ class Object
         template <typename T>
         T* getComponent() const {
             for (auto& c : components)
-                if (T* t = dynamic_cast<T*>(c.get())) return t;
+                if (T::CID == c->CID) {
+                    T* t = static_cast<T*>(c.get());
+                    return t;
+                }
             return nullptr;
         }
 
@@ -133,6 +74,83 @@ class Object
         }
 
         ~Object() = default;
+};
+
+struct MeshComponent : Component 
+{
+    static inline const unsigned int CID = Auric::Constants::MESHID;
+
+    std::vector<float> vertices;
+    std::vector<unsigned int> indices;
+    unsigned int texture = 0;
+
+    GLsizei indexCount = 0;
+    unsigned int VAO = 0, VBO = 0, EBO = 0;
+
+    ~MeshComponent() override;
+};
+
+struct CameraComponent : Component
+{
+    static inline const unsigned int CID = Auric::Constants::CAMERAID;
+    
+    glm::vec3 pos{0.0f, 0.0f, 0.0f};
+    glm::vec3 front{0.0f, 0.0f, -1.0f};
+    glm::vec3 up{0.0f, 1.0f, 0.0f};
+
+    float FOV;
+};
+
+struct RigComponent : Component
+{
+    Rig rig;
+};
+
+struct LightMapComponent : Component 
+{
+    static inline const unsigned int CID = Auric::Constants::LIGHTMAPID;
+
+    unsigned int lightMap = 0;
+    xatlas::Atlas* atlas = nullptr;
+
+    ~LightMapComponent() override;
+};
+
+// just a boolean to tell collision code
+// to add the objects mesh to the colliders
+struct ColliderComponent : Component {
+    static inline const unsigned int CID = Auric::Constants::COLLIDERID;
+};
+
+struct CapsuleColliderComponent : Component
+{
+    static inline const unsigned int CID = Auric::Constants::CAPSULECOLLIDERID;
+
+    float height = 1.8f; // capsule height
+    float radius = 0.3f; // capsule width
+    glm::vec3 velocity{0.0f};
+};
+
+struct AudioSourceComponent : Component
+{
+    static inline const unsigned int CID = Auric::Constants::AUDIOSOURCEID;
+
+    std::string path;
+    int index = -1;
+
+    bool loop = false;
+    float volume = 1.0f;
+    float maxDistance = 50.0f;
+    float falloff = 1.0f;
+
+    ~AudioSourceComponent() override;
+};
+
+struct ScriptComponent : Component
+{
+    static inline const unsigned int CID = Auric::Constants::SCRIPTID;
+
+    std::string path;
 };
 
 Object* findObject(const std::string& name,
