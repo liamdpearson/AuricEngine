@@ -44,6 +44,11 @@ class Object
         Object(const Transform& t)
             : transform(t) {}
 
+        void addComponent(std::unique_ptr<Component> comp) {
+            comp->owner = this;
+            this->components.push_back(std::move(comp));
+        }
+
         template <typename T>
         T* getComponent() const {
             for (auto& c : components)
@@ -103,6 +108,8 @@ struct CameraComponent : Component
 
 struct RigComponent : Component
 {
+    static inline const unsigned int CID = Auric::Constants::RIGID;
+    
     Rig rig;
 };
 

@@ -1,8 +1,9 @@
 #pragma once
 
-#include "include/objects/object.h"
+#include "include/scene/object.h"
 
 #include <vector>
+#include <string>
 
 
 struct ScriptInstance;

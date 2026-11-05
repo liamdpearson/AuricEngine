@@ -1,12 +1,14 @@
 #pragma once
 
-#include "graphics.h"
-
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 #include <glm/glm.hpp>
 #include <vector>
+#include <string>
+#include <memory>
+
+#include "include/render/graphics.h"
 
 
 const int UI_FLOATS = 4;

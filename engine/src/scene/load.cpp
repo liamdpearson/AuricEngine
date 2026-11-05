@@ -1,48 +1,132 @@
 #include "include/scene/load.h"
 
+#include <algorithm>
 #include <memory>
 #include <nlohmann/json.hpp>
 
 #include <fstream>
-#include <sol/sol.hpp>
 #include <string>
 #include <iostream>
-#include "include/core/constants.h"
+#include <vector>
 
 #include "include/core/constants.h"
+#include "include/core/lighting.h"
 #include "include/scene/object.h"
 #include "include/assets/assets.h"
+#include "include/ui/ui.h"
 
 
 using json = nlohmann::json;
 
-static std::unique_ptr<Component> buildComponent(const json& node, Object* owner)
+static void buildComponent(const json& node, Object* owner)
 {
     const unsigned int typeID = node.value("ID", 0);
 
-    std::unique_ptr<Component> comp;
-
     switch (typeID) {
-        case Auric::Constants::MESHID:
+        case Auric::Constants::MESHID: {
             const std::string meshpath = node.value("meshpath", "");
             const std::string texpath = node.value("texpath", "");
+            const bool pixelated = node.value("pixelated", false); 
+
+            std::pair<std::unique_ptr<MeshComponent>, std::unique_ptr<RigComponent>> pair;
+            pair = Auric::Assets::makeMesh(meshpath.c_str(), texpath.c_str(), pixelated);
+            
+            owner->addComponent(std::move(pair.first));
+            
+            if (pair.second != nullptr)
+                owner->addComponent(std::move(pair.second));
+            
             break;
-        case Auric::Constants::CAMERAID:
+        }
+
+        case Auric::Constants::CAMERAID: {
+            const float FOV = node.value("FOV", 90.0f);
+
+            std::unique_ptr<CameraComponent> cam = Auric::Assets::makeCamera(FOV);
+            owner->addComponent(std::move(cam));
+
             break;
+        }
+
+        case Auric::Constants::RIGID: {
+            const std::string path = node.value("path", "");
+
+            std::unique_ptr<RigComponent> rig = Auric::Assets::makeRig(path.c_str());
+            owner->addComponent(std::move(rig));
+
+            break;
+        }
+
+        case Auric::Constants::LIGHTMAPID: {
+            std::unique_ptr<LightMapComponent> lm = Auric::Assets::makeLightMap();
+            owner->addComponent(std::move(lm));
+
+            break;
+        }
+
+        case Auric::Constants::COLLIDERID: {
+            std::unique_ptr<ColliderComponent> col = Auric::Assets::makeCollider();
+            owner->addComponent(std::move(col));
+
+            break;
+        }
+
+        case Auric::Constants::CAPSULECOLLIDERID: {
+            const float radius = node.value("radius", 0.3f);
+            const float height = node.value("height", 1.8f);
+
+            std::unique_ptr<CapsuleColliderComponent> cap;
+            cap = Auric::Assets::makeCapsuleCollider(radius, height);
+            owner->addComponent(std::move(cap));
+
+            break;
+        }
+
+        case Auric::Constants::AUDIOSOURCEID: {
+            const std::string path = node.value("path", "");
+            const float volume = node.value("volume", 0.0f);
+            const float maxDistance = node.value("maxDistance", 0.0f);
+            const float falloff = node.value("falloff", 0.0f);
+            const bool loop = node.value("loop", false); 
+
+            std::unique_ptr<AudioSourceComponent> audiosource;
+            audiosource = Auric::Assets::makeAudioSource(path.c_str(), volume, maxDistance, falloff, loop);
+            owner->addComponent(std::move(audiosource));
+
+            break;
+        }
+
+        case Auric::Constants::SCRIPTID: {
+            const std::string path = node.value("path", "");
+
+            std::unique_ptr<ScriptComponent> script;
+            script = Auric::Assets::makeScript(path);
+            owner->addComponent(std::move(script));
+
+            break;
+        }
     }
 }
 
 static std::unique_ptr<Object> buildObject(const json& node, Object* parent)
 {
     const std::string name = node.value("name", "Unnamed Object");
-    const std::string type = node.value("type", "object");
     const std::string tag  = node.value("tag", "");
-    const std::string pbn = node.value("parentbonename", "");
+
     const json& t = node.at("transform");
 
     Transform transform{t.at(0).get<float>(), t.at(1).get<float>(), t.at(2).get<float>(),
                         t.at(3).get<float>(), t.at(4).get<float>(), t.at(5).get<float>(),
                         t.at(6).get<float>(), t.at(7).get<float>(), t.at(8).get<float>()};
+    
+    std::unique_ptr<Object> obj;
+    obj->setName(name); obj->setTag(tag); obj->transform = transform;
+
+    for (const json& comp: node.value("components", json::array()))
+        buildComponent(comp, obj.get());
+
+
+    const std::string pbn = node.value("parentbonename", "");
     int pbi = -1;
     if (parent && pbn != "") {
         RigComponent* rig = parent->getComponent<RigComponent>();
@@ -50,91 +134,9 @@ static std::unique_ptr<Object> buildObject(const json& node, Object* parent)
             pbi = rig->rig.findBoneIndex(pbn); 
         }
     }
-    
-    std::unique_ptr<Object> obj;
 
-    if (type == "object")
-    {
-        obj = std::make_unique<Object>(transform);
-    }
-    else if (type == "mesh")
-    {
-        obj = makeMesh(
-            transform,
-            node.at("meshpath").get<std::string>().c_str(),
-            node.at("texpath").get<std::string>().c_str(),
-            node.value("pixelated", false)
-        );
-    }
-    else if (type == "staticmesh")
-    {
-        obj = makeStaticMesh(
-            transform,
-            node.at("meshpath").get<std::string>().c_str(),
-            node.at("texpath").get<std::string>().c_str(),
-            node.value("pixelated", false),
-            node.value("collides", false)
-        );
-    }
-    else if (type == "animatedmesh")
-    {
-        obj = makeAnimatedMesh(
-            transform,
-            node.at("meshpath").get<std::string>().c_str(),
-            node.at("texpath").get<std::string>().c_str(),
-            node.value("pixelated", false)
-        );
-    }
-    else if (type == "animatedobj")
-    {
-        obj = makeAnimatedObj(
-            transform,
-            node.at("armaturepath").get<std::string>().c_str()
-        );
-    }
-    else if (type == "camera")
-    {
-        obj = std::make_unique<Camera>(
-            transform,
-            node.value("fov", 90.0f)
-        );
-
-        if (node.value("isCurrent", false))
-        {
-            if (Camera* cam = dynamic_cast<Camera*>(obj.get()))
-                currentCam = cam;
-        }
-    }
-    else if (type == "audiosource")
-    {
-        obj = makeAudioSource(
-            transform,
-            node.at("soundpath").get<std::string>(),
-            node.at("volume").get<float>(),
-            node.at("maxDistance").get<float>(),
-            node.at("falloff").get<float>(),
-            node.at("loop").get<bool>()
-        );
-    }
-    else if (type == "capsule")
-    {
-        obj = std::make_unique<Capsule>(
-            transform,
-            node.value("height", 1.8f),
-            node.value("radius", 0.3f)
-        );
-    }
-    else
-    {
-        std::cout << "buildObject: Error unrecognized object type " << type << '\n';
-        return nullptr;
-    }
-    
-    obj->setBoneIndex(pbi); obj->setName(name); obj->setTag(tag);
+    obj->setBoneIndex(pbi);
     if (parent) obj->parent = parent;
-
-    for (const std::string& path : node.value("scripts", json::array()))
-        attachScript(obj.get(), path);
 
     for (const json& child : node.value("children", json::array()))
     {

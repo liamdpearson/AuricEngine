@@ -36,6 +36,7 @@
             "components": [
                 {
                     "ID": 7,
+                    "path": "assets/sounds/test.wav",
                     "volume": 1.0,
                     "maxDistance": 30.0,
                     "falloff": 5.0,
