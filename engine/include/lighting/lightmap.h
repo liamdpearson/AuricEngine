@@ -5,10 +5,16 @@
 
 #include <vector>
 
+#include "include/scene/object.h"
+
+
+extern float lightmapResScalar;
 
 // loops through mesh tris and adds up area
 float getMeshArea(const std::vector<float>& verts,
                          const std::vector<unsigned int>& idx);
 
-bool GenUV2(xatlas::Atlas*& atlas, std::vector<float>& verts,
-                   std::vector<unsigned int>& idx, float resolution);
+void bakeLightmapLighting(LightMapComponent* lm, const MeshComponent* mesh);
+
+void initializeLightmap(LightMapComponent* lm, const MeshComponent* mesh, Object* obj);
+

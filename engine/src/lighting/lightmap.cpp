@@ -1,11 +1,16 @@
-#include "include/assets/lightmap.h"
+#include "include/lighting/lightmap.h"
+
+#include <xatlas/xatlas.h>
 
 #include <vector>
 #include <iostream>
 
 #include "include/core/constants.h"
+#include "include/scene/object.h"
+#include "include/types/primatives.h"
 
 
+float lightmapResScalar;
 
 // loops through mesh tris and adds up area
 float getMeshArea(const std::vector<float>& verts,
@@ -29,7 +34,7 @@ float getMeshArea(const std::vector<float>& verts,
 
 // uses xatlas to generate a second non overlapping 
 // uv mapping for a static mesh's lightmap.
-bool GenUV2(xatlas::Atlas*& atlas, std::vector<float>& verts,
+static bool GenUV2(xatlas::Atlas*& atlas, std::vector<float>& verts,
                    std::vector<unsigned int>& idx, float resolution)
 {
 
@@ -104,4 +109,18 @@ bool GenUV2(xatlas::Atlas*& atlas, std::vector<float>& verts,
               << "# of atlas islands: " << outputMesh.chartCount << '\n';
 
     return true;
+}
+
+void initializeLightmap(LightMapComponent* lm, const MeshComponent* mesh, Object* obj) {
+    xatlas::Atlas* atlas = lm->atlas;
+    const std::vector<float>& verts = mesh->vertices;
+    const std::vector<unsigned int>& idx = mesh->indices;
+    const Transform& transform = obj->transform;
+
+    float ogArea = getMeshArea(verts, idx);
+    float scaledArea = (transform.scaleX * transform.scaleY +
+                        transform.scaleX * transform.scaleZ +
+                        transform.scaleY * transform.scaleZ) * ogArea;
+    float resolution = std::sqrt(scaledArea * 64 * 64) * lightmapResScalar;
+    if (!GenUV2(atlas, verts, idx, resolution)) atlas = nullptr;
 }

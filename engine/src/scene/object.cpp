@@ -1,6 +1,9 @@
 #include "include/scene/object.h"
 
 
+// define scene variables
+std::vector<std::unique_ptr<Object>> rootObjs;
+
 Object* findObject(const std::string& name,
                    const std::vector<std::unique_ptr<Object>>& objs)
 {

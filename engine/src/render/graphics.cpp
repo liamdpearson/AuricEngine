@@ -15,11 +15,7 @@
 
 #include <iostream>
 #include <string>
-#include <memory>
 
-
-// define scene variables
-std::vector<std::unique_ptr<Object>> rootObjs;
 
 // ptr to current camera
 CameraComponent* currentCam;
@@ -284,7 +280,7 @@ unsigned int loadLightMap(std::vector<glm::vec3>& pixels, int width, int height)
 
 // creates proj and view matrices for the camera and sends them to shader locations.
 // takes in cam as an argument so a scene can have multiple cameras.
-void configureCamera(Camera*& cam)
+void configureCamera(CameraComponent*& cam)
 {
     int frameBuffWidth, frameBuffHeight;
     glfwGetFramebufferSize(window, &frameBuffWidth, &frameBuffHeight);
@@ -296,9 +292,9 @@ void configureCamera(Camera*& cam)
     );
 
     glm::mat4 view = glm::lookAt(
-        cam->getPos(),
-        cam->getPos() + cam->getFront(),
-        cam->getUp()
+        cam->pos,
+        cam->pos + cam->front,
+        cam->up
     );
 
     glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));

@@ -151,7 +151,7 @@ static Light* buildLight(const json& node)
 {
     std::string type = node.value("type", "point"); // defauts to point light
 
-    std::string name = node.value("name", "Unnamed Light");
+   std::string name = node.value("name", "Unnamed Light");
     std::string tag  = node.value("tag", "");
 
     const json& c = node.at("color");

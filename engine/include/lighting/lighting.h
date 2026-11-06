@@ -1,12 +1,13 @@
 #pragma once
 
-#include "raycast.h"
-
 #include <glm/glm.hpp>
 
 #include <vector>
 #include <utility>
 #include <string>
+
+#include "include/types/primatives.h"
+#include "include/physics/raycast.h"
 
 
 // scene light used only in lighting bake
@@ -42,7 +43,6 @@ struct LightGrid
 
 extern std::vector<Light*> lights;
 extern float ambient;
-extern float lightmapResScalar;
 extern std::vector<Tri> occluders;
 extern BVHnode rootNode;
 extern LightGrid lightGrid;

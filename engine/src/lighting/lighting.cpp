@@ -1,4 +1,4 @@
-#include "/include/core/lighting.h"
+#include "/include/lighting/lighting.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -9,6 +9,8 @@
 #include <iostream>
 #include <algorithm>
 #include <utility>
+
+#include "include/scene/object.h"
 
 
 std::vector<Light*> lights;
@@ -224,8 +226,6 @@ std::pair<glm::vec3, glm::vec3> gridLightAt(const glm::vec3& p)
 // original bake lighting call
 void bakeSceneLighting()
 {
-    double start = glfwGetTime();
-
     occluders.clear();
     lightGrid = LightGrid{};
 
@@ -288,7 +288,4 @@ void bakeSceneLighting()
     // bake lighting
     for (std::unique_ptr<Object>& obj : rootObjs)
         obj->BakeLighting(glm::mat4(1.0f));
-
-
-    std::cout << "bake took " << (glfwGetTime() - start) << "s\n";
 }

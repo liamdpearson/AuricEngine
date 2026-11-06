@@ -3,7 +3,6 @@
 #include "include/scene/object.h"
 #include <memory>
 #include <string>
-#include <xatlas/xatlas.h>
 
 
 namespace Auric::Assets {

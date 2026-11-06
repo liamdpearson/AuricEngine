@@ -160,5 +160,8 @@ struct ScriptComponent : Component
     std::string path;
 };
 
+// define scene variables
+extern std::vector<std::unique_ptr<Object>> rootObjs;
+
 Object* findObject(const std::string& name,
                    const std::vector<std::unique_ptr<Object>>& objs);
