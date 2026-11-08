@@ -215,6 +215,9 @@ extern std::vector<Font> fonts;
 extern const char* uiVertShader;
 extern const char* uiFragShader;
 
+namespace Auric::UI
+{
+
 void buildUIProgram();
 
 void beginUI();
@@ -224,6 +227,8 @@ void endUI();
 Font bakeFont(const char* path, float pixelHeight);
 
 void layoutText(UIText& t);
+
+}
 
 UIElement* findUIElement(const std::string& name,
                          const std::vector<std::unique_ptr<UIElement>>& elements);

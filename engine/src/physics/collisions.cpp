@@ -1,9 +1,9 @@
-#include "../include/collisions.h"
-
-#include "../include/graphics.h"
+#include "include/physics/collisions.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+
+#include "include/scene/object.h"
 
 
 std::vector<TriAABB> colliders;
@@ -58,7 +58,7 @@ static glm::vec3 closestPointOnSegment(const glm::vec3& p,
 
 static const float GROUND_NORMAL_Y = 0.7f;
 
-static void resolveCapsuleCollisionStep(Capsule* capsule, const std::vector<TriAABB>& colliders)
+static void resolveCapsuleCollisionStep(CapsuleColliderComponent* capsule, const std::vector<TriAABB>& colliders)
 {
     const float radiusSq = capsule->radius * capsule->radius;
     // adjust multiple times per frame so if an adjustment pushes capsule into a
@@ -66,7 +66,7 @@ static void resolveCapsuleCollisionStep(Capsule* capsule, const std::vector<TriA
     for (int i = 0; i < 4; ++i)
     {
         // rebuild the player box for every adjustment
-        glm::vec3 feet(capsule->transform.x, capsule->transform.y, capsule->transform.z);
+        glm::vec3 feet(capsule->owner->transform.x, capsule->owner->transform.y, capsule->owner->transform.z);
         AABB capsuleBox;
         capsuleBox.min = feet - glm::vec3(capsule->radius, 0.0f, capsule->radius);
         capsuleBox.max = feet + glm::vec3(capsule->radius, capsule->height, capsule->radius);
@@ -85,7 +85,6 @@ static void resolveCapsuleCollisionStep(Capsule* capsule, const std::vector<TriA
             // doesnt sqrt until after the degen check for slight optimization.
             glm::vec3 faceNormal = rawNormal / glm::sqrt(normalLenSq);
 
-            glm::vec3 feet(capsule->transform.x, capsule->transform.y, capsule->transform.z);
             glm::vec3 base = feet + glm::vec3(0.0f, capsule->radius, 0.0f);
             glm::vec3 tip  = feet + glm::vec3(0.0f, capsule->height - capsule->radius, 0.0f);
             if (tip.y < base.y) tip = base; // degenerate to a sphere if capsule is wider than tall
@@ -129,15 +128,15 @@ static void resolveCapsuleCollisionStep(Capsule* capsule, const std::vector<TriA
                 depth = capsule->radius;
             }
 
-            capsule->transform.y += pushDir.y * depth;
+            capsule->owner->transform.y += pushDir.y * depth;
 
             if (pushDir.y > GROUND_NORMAL_Y) {
                 // only cancel the component of motion heading straight down into the surface
                 capsule->velocity.y -= pushDir.y * glm::min(0.0f, capsule->velocity.y * pushDir.y);
             } else {
                 // only push player on x and z if its not a ground tri
-                capsule->transform.x += pushDir.x * depth;
-                capsule->transform.z += pushDir.z * depth;
+                capsule->owner->transform.x += pushDir.x * depth;
+                capsule->owner->transform.z += pushDir.z * depth;
 
                 // cancel the component of motion heading into the surface
                 capsule->velocity -= pushDir * glm::min(0.0f, glm::dot(capsule->velocity, pushDir));
@@ -150,16 +149,16 @@ static void resolveCapsuleCollisionStep(Capsule* capsule, const std::vector<TriA
     }
 }
 
-void resolveCapsuleCollisions(Capsule* cap, float deltaTime)
+void resolveCapsuleCollisions(CapsuleColliderComponent* cap, float deltaTime)
 {
     glm::vec3 step = cap->velocity * deltaTime;
     int substeps = glm::max(1, (int)glm::ceil(glm::length(step) / (cap->radius * 0.5f)));
 
     for (int i = 0; i < substeps; ++i)
     {
-        cap->transform.x += step.x / substeps;
-        cap->transform.y += step.y / substeps;
-        cap->transform.z += step.z / substeps;
+        cap->owner->transform.x += step.x / substeps;
+        cap->owner->transform.y += step.y / substeps;
+        cap->owner->transform.z += step.z / substeps;
 
         resolveCapsuleCollisionStep(cap, colliders);
     }

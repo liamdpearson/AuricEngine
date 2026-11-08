@@ -1,8 +1,13 @@
-#include "include/audio.h"
+#include "include/core/audio.h"
 #include "audio_internal.h"
+#include "include/scene/object.h"
 
 #include <iostream>
+#include <algorithm>
 
+
+namespace Auric::Audio
+{
 
 int initAudio()
 {
@@ -34,7 +39,7 @@ void setMasterVolume(float vol)
 }
 
 // finds first empty voice slot and returns index
-int findEmpty()
+static int findEmpty()
 {
     for (int i = 0; i < MAX_VOICES; ++i)
     {
@@ -74,7 +79,7 @@ void playSound2D(const char* path, float vol)
 }
 
 // initalizes sound and returns index to it in voices
-int initSound(const char* path, const glm::vec3& pos, float vol, bool loop)
+static int initSound(const char* path, const glm::vec3& pos, float vol, bool loop)
 {
     int i = findEmpty();
     if (i < 0) {
@@ -106,6 +111,44 @@ int initSound(const char* path, const glm::vec3& pos, float vol, bool loop)
     ma_sound_set_looping(&sound, loop ? MA_TRUE : MA_FALSE);
 
     return i;
+}
+
+void playAudioSource(AudioSourceComponent* as)
+{
+    if (as->index < 0) {
+        glm::vec3 pos{as->owner->transform.x, as->owner->transform.y, as->owner->transform.z};
+        int i = initSound(as->path.c_str(), pos, as->volume, as->loop);
+        if (i < 0) return;
+        as->index = i; 
+    }
+
+    ma_sound& sound = voices[as->index].sound;
+    ma_sound_stop(&sound);
+    ma_sound_seek_to_pcm_frame(&sound, 0);
+    ma_sound_start(&sound);
+
+}
+
+void stopAudioSource(AudioSourceComponent* as)
+{
+    if (as->index >= 0) {
+        ma_sound& sound = voices[as->index].sound;
+        ma_sound_stop(&sound);
+        ma_sound_seek_to_pcm_frame(&sound, 0);
+        voices[as->index].active = false;
+        as->index = -1;
+    }
+}
+
+void uninitializeAudioSource(AudioSourceComponent* as)
+{
+    if (as->index >= 0 && initialized && voices[as->index].initialized) {
+        ma_sound& sound = voices[as->index].sound;
+        ma_sound_stop(&sound);
+        ma_sound_uninit(&sound);
+        voices[as->index].active = false;
+        voices[as->index].initialized = false;
+    }
 }
 
 void updateAudio(const glm::vec3& pos, const glm::vec3& front, const glm::vec3& up)
@@ -152,4 +195,6 @@ void uninitAudio()
         ma_engine_uninit(&engine);
         initialized = false;
     }
+}
+
 }

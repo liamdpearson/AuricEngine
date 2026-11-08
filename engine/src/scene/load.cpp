@@ -1,6 +1,5 @@
 #include "include/scene/load.h"
 
-#include <algorithm>
 #include <memory>
 #include <nlohmann/json.hpp>
 
@@ -10,7 +9,10 @@
 #include <vector>
 
 #include "include/core/constants.h"
-#include "include/core/lighting.h"
+#include "include/core/audio.h"
+#include "include/lighting/lighting.h"
+#include "include/lighting/lightmap.h"
+#include "include/render/window.h"
 #include "include/scene/object.h"
 #include "include/assets/assets.h"
 #include "include/ui/ui.h"
@@ -151,7 +153,7 @@ static Light* buildLight(const json& node)
 {
     std::string type = node.value("type", "point"); // defauts to point light
 
-   std::string name = node.value("name", "Unnamed Light");
+    std::string name = node.value("name", "Unnamed Light");
     std::string tag  = node.value("tag", "");
 
     const json& c = node.at("color");
@@ -161,7 +163,6 @@ static Light* buildLight(const json& node)
     float falloff   = node.at("falloff").get<float>();
 
     if (type == "point") {
-
         PointLight* light = new PointLight{};
 
         const json& p = node.at("pos");
@@ -209,7 +210,7 @@ static std::unique_ptr<UIElement> buildUIElement(const json& node, UIElement* pa
     const std::string tag  = node.value("tag", "");
     const json& t = node.at("uitransform");
 
-    UITransform transform{t.at(0).get<float>() * SW, t.at(1).get<float>() * SH,
+    UITransform transform{t.at(0).get<float>() * Auric::Render::SW, t.at(1).get<float>() * Auric::Render::SH,
                           t.at(2).get<float>(), t.at(3).get<float>(), t.at(4).get<float>()};
 
     std::unique_ptr<UIElement> ui;
@@ -254,6 +255,14 @@ static std::unique_ptr<UIElement> buildUIElement(const json& node, UIElement* pa
     return ui;
 }
 
+namespace Auric::Scene
+{
+
+// set scene variables
+std::string startupScene = "assets/scenes/scene1.json";
+std::string pendingScene = "";
+
+
 int loadScene(const char* path)
 {
     std::ifstream file(path);
@@ -273,8 +282,8 @@ int loadScene(const char* path)
         json scene;
         file >> scene;
 
-        ambient = scene.value("ambient", 0.0f);
-        lightmapResScalar = scene.value("lightmapResScalar", 0.01f);
+        Auric::Lighting::ambient = scene.value("ambient", 0.0f);
+        Auric::Lighting::lightmapResScalar = scene.value("lightmapResScalar", 0.01f);
 
         for (const json& node : scene.value("objects", json::array()))
         {
@@ -288,7 +297,7 @@ int loadScene(const char* path)
         }
         for (const json& node : scene.value("fonts", json::array()))
         {
-            Font f = bakeFont(
+            Font f = Auric::UI::bakeFont(
                 node.at("ttfpath").get<std::string>().c_str(),
                 node.value("pixelheight", 32.0f)
             );
@@ -304,7 +313,7 @@ int loadScene(const char* path)
             attachScript(nullptr, path);
 
         rootObjs = std::move(tempObjs);
-        lights = tempLights;
+        Auric::Lighting::lights = tempLights;
         for (Font& f : fonts) glDeleteTextures(1, &f.atlas);
         fonts = tempFonts;
         uiRoots = std::move(tempUI);
@@ -325,12 +334,12 @@ int swapScene(const char* path)
     uiRoots.clear();
     resetScripting();
     rootObjs.clear();
-    uninitSounds();
+    Auric::Audio::uninitSounds();
     currentCam = nullptr;
-    ambient = 0.0f;
-    lightmapResScalar = 0.01;
-    for (Light* l : lights) delete l;
-    lights.clear();
+    Auric::Lighting::ambient = 0.0f;
+    Auric::Lighting::lightmapResScalar = 0.01;
+    for (Light* l : Auric::Lighting::lights) delete l;
+    Auric::Lighting::lights.clear();
 
     if (!loadScene(path)) return 0;
     loadScripts();
@@ -376,4 +385,6 @@ int loadConfig(const char* path)
     }
 
     return 1;
+}
+
 }

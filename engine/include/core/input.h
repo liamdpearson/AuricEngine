@@ -3,6 +3,9 @@
 #include <GLFW/glfw3.h>
 
 
+namespace Auric::Input
+{
+
 void mouseMoveCallback(GLFWwindow*, double xpos, double ypos);
 
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
@@ -26,3 +29,5 @@ float mouseDX();
 float mouseDY();
 
 void endFrameInput();
+
+}

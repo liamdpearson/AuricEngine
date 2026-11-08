@@ -13,13 +13,14 @@
 #include "include/scene/object.h"
 
 
+namespace Auric::Lighting
+{
+
 std::vector<Light*> lights;
 float ambient = 1.0f; // default value overriden in loadScene
-float lightmapResScalar = 0.01f; // default value overriden in loadScene
 std::vector<Tri> occluders;
 BVHnode rootNode;
 LightGrid lightGrid;
-
 
 glm::vec3 sampleLightAt(const glm::vec3& p)
 {
@@ -230,8 +231,8 @@ void bakeSceneLighting()
     lightGrid = LightGrid{};
 
     // collect light occluder triangles
-    for (std::unique_ptr<Object>& obj : rootObjs)
-        obj->CollectOccluders(glm::mat4(1.0f), occluders);
+    // for (std::unique_ptr<Object>& obj : rootObjs)
+    //     obj->CollectOccluders(glm::mat4(1.0f), occluders);
     
     std::cout << "baked " << occluders.size() << " occluder Tris"  << '\n';
 
@@ -286,6 +287,8 @@ void bakeSceneLighting()
     }
 
     // bake lighting
-    for (std::unique_ptr<Object>& obj : rootObjs)
-        obj->BakeLighting(glm::mat4(1.0f));
+    // for (std::unique_ptr<Object>& obj : rootObjs)
+    //     obj->BakeLighting(glm::mat4(1.0f));
+}
+
 }

@@ -1,11 +1,15 @@
 #include "scripts_internal.h"
 
-#include "../include/collisions.h"
-#include "../include/input.h"
-#include "../include/ui.h"
-#include "../include/audio.h"
-#include <fstream>
+#include "include/scene/object.h"
+#include "include/scene/load.h"
+#include "include/physics/collisions.h"
+#include "include/render/window.h"
+#include "include/core/input.h"
+#include "include/core/audio.h"
+#include "include/ui/ui.h"
 #include <cstring>
+#include <vector>
+#include <fstream>
 
 
 sol::state lua;
@@ -18,32 +22,6 @@ void attachScript(Object* obj, std::string path)
     si.obj = obj;
     si.path = path;
     scripts.push_back(si);
-}
-
-static sol::object objectToLua(Object* obj)
-{
-    if (Capsule* capsule = dynamic_cast<Capsule*>(obj))
-        return sol::make_object(lua, capsule);
-
-    else if (Camera* camera = dynamic_cast<Camera*>(obj))
-        return sol::make_object(lua, camera);
-
-    else if (AudioSource* audiosource = dynamic_cast<AudioSource*>(obj))
-        return sol::make_object(lua, audiosource);
-
-    else if (AnimatedObj* animatedObj = dynamic_cast<AnimatedObj*>(obj))
-        return sol::make_object(lua, animatedObj);
-
-    else if (AnimatedMesh* animatedMesh = dynamic_cast<AnimatedMesh*>(obj))
-        return sol::make_object(lua, animatedMesh);
-
-    else if (StaticMesh* staticMesh = dynamic_cast<StaticMesh*>(obj))
-        return sol::make_object(lua, staticMesh);
-
-    else if (Mesh* mesh = dynamic_cast<Mesh*>(obj))
-        return sol::make_object(lua, mesh);
-
-    return sol::make_object(lua, obj);
 }
 
 static sol::object uiToLua(UIElement* ui)
@@ -120,67 +98,59 @@ static void registerLuaAPI()
         "scaleX", &Transform::scaleX,
         "scaleY", &Transform::scaleY,
         "scaleZ", &Transform::scaleZ,
-        "pos", [](Transform* t) { return glm::vec3{t->x, t->y, t->z}; }
-    );
-    lua.new_usertype<Rig>("Rig",
-        "currentAnim", &Rig::currentAnim,
-        "animSpeed", &Rig::animSpeed,
-        "setAnim", sol::overload(
-            [](Rig& r, int i)                 { r.setAnim(i); },
-            [](Rig& r, int i, float b)        { r.setAnim(i, b); },
-            [](Rig& r, int i, float b, int n) { r.setAnim(i, b, n); }
-        )
+        // returns just (x, y, z), small helper fn for users
+        "pos", [](Transform* t) { return glm::vec3{t->x, t->y, t->z}; } 
     );
     lua.new_usertype<Object>("Object",
         "name", sol::property(&Object::getName, &Object::setName),
         "tag", sol::property(&Object::getTag, &Object::setTag),
         "draw", &Object::draw,
-        "transform", &Object::transform
+        "transform", &Object::transform,
+        "getCamera", [](Object* obj) { return obj->getComponent<CameraComponent>(); },
+        "getRig", [](Object* obj) { return obj->getComponent<RigComponent>(); },
+        "getCapsuleCollider", [](Object* obj) { return obj->getComponent<CapsuleColliderComponent>(); },
+        "getAudioSource", [](Object* obj) { return obj->getComponent<AudioSourceComponent>(); }
     );
-    lua.new_usertype<Mesh>("Mesh",
-        sol::base_classes, sol::bases<Object>()
+    lua.new_usertype<CameraComponent>("Camera",
+        "pos", &CameraComponent::pos,
+        "front", &CameraComponent::front,
+        "up", &CameraComponent::up, 
+        "setCurrent", [](CameraComponent* c) { currentCam = c; }
     );
-    lua.new_usertype<StaticMesh>("StaticMesh",
-        sol::base_classes, sol::bases<Object, Mesh>()
+    lua.new_usertype<RigComponent>("Rig",
+        "currentAnim", sol::property(
+          [](RigComponent& r)        { return r.rig.currentAnim; },
+          [](RigComponent& r, int v) { r.rig.currentAnim = v; }
+        ),
+        "animSpeed", sol::property(
+          [](RigComponent& r)          { return r.rig.animSpeed; },
+          [](RigComponent& r, float v) { r.rig.animSpeed = v; }
+        ),
+        "setAnim", sol::overload(
+            [](RigComponent& r, int i)                 { r.rig.setAnim(i); },
+            [](RigComponent& r, int i, float b)        { r.rig.setAnim(i, b); },
+            [](RigComponent& r, int i, float b, int n) { r.rig.setAnim(i, b, n); }
+        )
     );
-    lua.new_usertype<AnimatedMesh>("AnimatedMesh",
-        "rig", &AnimatedMesh::rig,
-        sol::base_classes, sol::bases<Object, Mesh>()
+    lua.new_usertype<CapsuleColliderComponent>("Capsule",
+        "height", &CapsuleColliderComponent::height,
+        "radius", &CapsuleColliderComponent::radius,
+        "velocity", &CapsuleColliderComponent::velocity,
+        "resolveCollisions", [](CapsuleColliderComponent* cap, float deltaTime) { resolveCapsuleCollisions(cap, deltaTime); }
     );
-    lua.new_usertype<AnimatedObj>("AnimatedObj",
-        "rig", &AnimatedObj::rig,
-        sol::base_classes, sol::bases<Object>()
-    );
-    lua.new_usertype<Camera>("Camera",
-        "pos", sol::property(&Camera::getPos, &Camera::setPos),
-        "front", sol::property(&Camera::getFront, &Camera::setFront),
-        "up", sol::property(&Camera::getUp, &Camera::setUp),
-        "setCurrent", [](Camera* c) { currentCam = c; },
-        sol::base_classes, sol::bases<Object>()
-    );
-    lua.new_usertype<AudioSource>("AudioSource",
-        "loop", sol::property(&AudioSource::getLoop, &AudioSource::setLoop),
-        "volume", &AudioSource::volume,
-        "play", &AudioSource::Play,
-        "stop", &AudioSource::Stop,
-        sol::base_classes, sol::bases<Object>()
-    );
-    lua.new_usertype<Capsule>("Capsule",
-        "height", &Capsule::height,
-        "radius", &Capsule::radius,
-        "velocity", &Capsule::velocity,
-        "resolveCollisions", [](Capsule* cap, float deltaTime) { resolveCollisions(cap, deltaTime); },
-        sol::base_classes, sol::bases<Object>()
+    lua.new_usertype<AudioSourceComponent>("AudioSource",
+        "loop", &AudioSourceComponent::loop,
+        "volume", &AudioSourceComponent::volume
     );
     lua.create_named_table("input",
-        "keyPressed",   &keyPressed,
-        "keyHeld",      &keyHeld,
-        "keyReleased",  &keyReleased,
-        "mousePressed",  &mouseButtonPressed,
-        "mouseHeld",     &mouseButtonHeld,
-        "mouseReleased", &mouseButtonReleased,
-        "mouseDX", &mouseDX,
-        "mouseDY", &mouseDY
+        "keyPressed",   &Auric::Input::keyPressed,
+        "keyHeld",      &Auric::Input::keyHeld,
+        "keyReleased",  &Auric::Input::keyReleased,
+        "mousePressed",  &Auric::Input::mouseButtonPressed,
+        "mouseHeld",     &Auric::Input::mouseButtonHeld,
+        "mouseReleased", &Auric::Input::mouseButtonReleased,
+        "mouseDX", &Auric::Input::mouseDX,
+        "mouseDY", &Auric::Input::mouseDY
     );
     lua.create_named_table("key",
         "Q", GLFW_KEY_Q,
@@ -199,12 +169,13 @@ static void registerLuaAPI()
     );
     lua.create_named_table("mouse",
         "LEFT",  GLFW_MOUSE_BUTTON_LEFT,
+        "MIDDLE",  GLFW_MOUSE_BUTTON_MIDDLE,
         "RIGHT", GLFW_MOUSE_BUTTON_RIGHT
     );
     sol::table find = lua.create_named_table("find");
     find.set_function("obj", [](const std::string& name) {
         Object* obj = findObject(name, rootObjs);
-        return objectToLua(obj);
+        return obj;
     });
     find.set_function("ui", [](const std::string& name) {
         UIElement* ui = findUIElement(name, uiRoots);
@@ -215,16 +186,16 @@ static void registerLuaAPI()
         return rayOccluded(origin, dir, maxDist, rootNode);
     });
     lua.set_function(
-        "swapScene", [](const std::string& path) { pendingScene = path; }
+        "swapScene", [](const std::string& path) { Auric::Scene::pendingScene = path; }
     );
     lua.set_function(
-        "playSound", [](const std::string& path, float vol) { playSound2D(path.c_str(), vol); }
+        "playSound", [](const std::string& path, float vol) { Auric::Audio::playSound2D(path.c_str(), vol); }
     );
     lua.set_function(
-        "setMasterVolume", [](float vol) { setMasterVolume(vol); }
+        "setMasterVolume", [](float vol) { Auric::Audio::setMasterVolume(vol); }
     );
     lua.set_function(
-        "quit", []() { glfwSetWindowShouldClose(window, true); }
+        "quit", []() { glfwSetWindowShouldClose(Auric::Render::window, true); }
     );
 }
 
@@ -254,22 +225,7 @@ void loadScripts()
         si.env = env;
 
         if (si.obj) {
-            if (Capsule* capsule = dynamic_cast<Capsule*>(si.obj))
-                si.env["self"] = capsule;
-            else if (Camera* camera = dynamic_cast<Camera*>(si.obj))
-                si.env["self"] = camera;
-            else if (AudioSource* audiosource = dynamic_cast<AudioSource*>(si.obj))
-                si.env["self"] = audiosource;
-            else if (AnimatedObj* animatedObj = dynamic_cast<AnimatedObj*>(si.obj))
-                si.env["self"] = animatedObj;
-            else if (AnimatedMesh* animatedMesh = dynamic_cast<AnimatedMesh*>(si.obj))
-                si.env["self"] = animatedMesh;
-            else if (StaticMesh* staticMesh = dynamic_cast<StaticMesh*>(si.obj))
-                si.env["self"] = staticMesh;
-            else if (Mesh* mesh = dynamic_cast<Mesh*>(si.obj))
-                si.env["self"] = mesh;
-            else
-                si.env["self"] = si.obj;
+            si.env["self"] = si.obj;
         }
 
         sol::load_result loaded = lua.load(source, si.path);

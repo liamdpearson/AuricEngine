@@ -1,5 +1,7 @@
 #include "include/scene/object.h"
 
+#include "include/core/audio.h"
+
 
 // define scene variables
 std::vector<std::unique_ptr<Object>> rootObjs;
@@ -33,5 +35,5 @@ LightMapComponent::~LightMapComponent()
 
 AudioSourceComponent::~AudioSourceComponent()
 {
-    // TODO: add function call to audio engine to delete sound at index
+    Auric::Audio::uninitializeAudioSource(this);
 }

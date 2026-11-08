@@ -10,27 +10,19 @@
 
 #include <xatlas/xatlas.h>
 
-#include <string>
 #include <chrono>
 
 #include "include/scene/object.h"
 
-// define scene variables
-extern std::vector<std::unique_ptr<Object>> rootObjs;
 
 // draws from this camera
 extern CameraComponent* currentCam;
+extern float deltaTime;
 
-// set scene variables
-extern std::string startupScene;
-extern std::string pendingScene;
-
-// define opengl variables
-extern GLFWwindow* window;
-extern int SW, SH;
+namespace Auric::Render
+{
 
 extern double target_frame_duration;
-extern float deltaTime;
 extern std::chrono::high_resolution_clock::time_point lastFrameTime, currentFrameTime;
 
 extern unsigned int shaderProgram;
@@ -40,8 +32,6 @@ extern int texLoc, lightMapLoc, lightModeLoc, lightDirLoc, objectLightLoc;
 
 extern const char* vertexShaderSource;
 extern const char* fragmentShaderSource;
-
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
 int compileShader(GLenum type, const char* src);
 
@@ -54,3 +44,5 @@ std::pair<int, int> textureDimensions(const char* path);
 unsigned int loadTexture(const char* src, bool pixelated, bool clampEdge = false);
 
 unsigned int loadLightMap(std::vector<glm::vec3>& pixels, int width, int height);
+
+}

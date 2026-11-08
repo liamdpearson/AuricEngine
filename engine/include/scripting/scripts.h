@@ -10,6 +10,9 @@ struct ScriptInstance;
 
 extern std::vector<ScriptInstance> scripts;
 
+namespace Auric::Scripting
+{
+
 void attachScript(Object* obj, std::string path);
 
 void resetScripting();
@@ -21,3 +24,5 @@ void initScripting();
 void startScripts();
 
 void updateScripts();
+
+}

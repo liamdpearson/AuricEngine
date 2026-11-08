@@ -1,9 +1,10 @@
-#include "../include/input.h"
+#include "include/core/input.h"
 
 #include <GLFW/glfw3.h>
 
 #include <vector>
 #include <algorithm>
+
 
 std::vector<int> keys_pressed;
 std::vector<int> mouse_buttons_pressed;
@@ -18,6 +19,9 @@ float lastX, lastY;
 float xPos, yPos;
 float xoff, yoff;
 bool firstMouse = true;
+
+namespace Auric::Input
+{
 
 void mouseMoveCallback(GLFWwindow*, double xpos, double ypos)
 {
@@ -105,4 +109,6 @@ void endFrameInput() {
     xoff = 0.0f; yoff = 0.0f;
     keys_pressed = {}; keys_released = {};
     mouse_buttons_pressed = {}; mouse_buttons_released = {};
+}
+
 }

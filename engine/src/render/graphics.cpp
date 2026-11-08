@@ -1,10 +1,9 @@
 #include "include/scene/object.h"
-#include <fstream>
-#include <sstream>
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb/stb_image.h"
 
 #include "include/render/graphics.h"
+#include "include/render/window.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -14,22 +13,16 @@
 #include <glm/gtc/type_ptr.hpp>         // value_ptr (hand a matrix to OpenGL)
 
 #include <iostream>
-#include <string>
 
 
 // ptr to current camera
 CameraComponent* currentCam;
+float deltaTime = 0.0f;
 
-// set scene variables
-std::string startupScene = "assets/scenes/scene1.json";
-std::string pendingScene = "";
-
-// define opengl variables
-GLFWwindow* window;
-int SW, SH;
+namespace Auric::Render
+{
 
 double target_frame_duration;
-float deltaTime = 0.0f;
 std::chrono::high_resolution_clock::time_point lastFrameTime = std::chrono::high_resolution_clock::now();
 std::chrono::high_resolution_clock::time_point currentFrameTime = std::chrono::high_resolution_clock::now();
 
@@ -130,11 +123,6 @@ void main()
 }
 )glsl";
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
-{
-    glViewport(0, 0, width, height);
-}
-
 // compiles glsl shader.
 int compileShader(GLenum type, const char* src)
 {
@@ -180,22 +168,6 @@ unsigned int linkShaderProgram(const char* vsSrc, const char* fsSrc)
     glDeleteShader(fs);
     return sp;
 
-}
-
-static std::string loadShaderAsString(const std::string& path) {
-    std::string result;
-    std::ifstream file(path);
-
-    if (!file.is_open()) {
-        std::cout << "Could not open shader file " << path << '\n';
-        return "";
-    }
-
-    std::stringstream stream;
-    stream << file.rdbuf();
-    file.close();
-
-    return stream.str();
 }
 
 // builds shader program and sets locations for shader variables.
@@ -299,4 +271,6 @@ void configureCamera(CameraComponent*& cam)
 
     glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
     glUniformMatrix4fv(viewLoc,       1, GL_FALSE, glm::value_ptr(view));
+}
+
 }
