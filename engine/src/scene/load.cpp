@@ -14,24 +14,26 @@
 #include "include/lighting/lightmap.h"
 #include "include/render/window.h"
 #include "include/scene/object.h"
-#include "include/assets/assets.h"
+#include "include/scene/assets.h"
 #include "include/ui/ui.h"
 
 
 using json = nlohmann::json;
+
+using namespace Auric;
 
 static void buildComponent(const json& node, Object* owner)
 {
     const unsigned int typeID = node.value("ID", 0);
 
     switch (typeID) {
-        case Auric::Constants::MESHID: {
+        case Constants::MESHID: {
             const std::string meshpath = node.value("meshpath", "");
             const std::string texpath = node.value("texpath", "");
             const bool pixelated = node.value("pixelated", false); 
 
             std::pair<std::unique_ptr<MeshComponent>, std::unique_ptr<RigComponent>> pair;
-            pair = Auric::Assets::makeMesh(meshpath.c_str(), texpath.c_str(), pixelated);
+            pair = Assets::makeMesh(meshpath.c_str(), texpath.c_str(), pixelated);
             
             owner->addComponent(std::move(pair.first));
             
@@ -41,50 +43,50 @@ static void buildComponent(const json& node, Object* owner)
             break;
         }
 
-        case Auric::Constants::CAMERAID: {
+        case Constants::CAMERAID: {
             const float FOV = node.value("FOV", 90.0f);
 
-            std::unique_ptr<CameraComponent> cam = Auric::Assets::makeCamera(FOV);
+            std::unique_ptr<CameraComponent> cam = Assets::makeCamera(FOV);
             owner->addComponent(std::move(cam));
 
             break;
         }
 
-        case Auric::Constants::RIGID: {
+        case Constants::RIGID: {
             const std::string path = node.value("path", "");
 
-            std::unique_ptr<RigComponent> rig = Auric::Assets::makeRig(path.c_str());
+            std::unique_ptr<RigComponent> rig = Assets::makeRig(path.c_str());
             owner->addComponent(std::move(rig));
 
             break;
         }
 
-        case Auric::Constants::LIGHTMAPID: {
-            std::unique_ptr<LightMapComponent> lm = Auric::Assets::makeLightMap();
+        case Constants::LIGHTMAPID: {
+            std::unique_ptr<LightMapComponent> lm = Assets::makeLightMap();
             owner->addComponent(std::move(lm));
 
             break;
         }
 
-        case Auric::Constants::COLLIDERID: {
-            std::unique_ptr<ColliderComponent> col = Auric::Assets::makeCollider();
+        case Constants::COLLIDERID: {
+            std::unique_ptr<ColliderComponent> col = Assets::makeCollider();
             owner->addComponent(std::move(col));
 
             break;
         }
 
-        case Auric::Constants::CAPSULECOLLIDERID: {
+        case Constants::CAPSULECOLLIDERID: {
             const float radius = node.value("radius", 0.3f);
             const float height = node.value("height", 1.8f);
 
             std::unique_ptr<CapsuleColliderComponent> cap;
-            cap = Auric::Assets::makeCapsuleCollider(radius, height);
+            cap = Assets::makeCapsuleCollider(radius, height);
             owner->addComponent(std::move(cap));
 
             break;
         }
 
-        case Auric::Constants::AUDIOSOURCEID: {
+        case Constants::AUDIOSOURCEID: {
             const std::string path = node.value("path", "");
             const float volume = node.value("volume", 0.0f);
             const float maxDistance = node.value("maxDistance", 0.0f);
@@ -92,17 +94,17 @@ static void buildComponent(const json& node, Object* owner)
             const bool loop = node.value("loop", false); 
 
             std::unique_ptr<AudioSourceComponent> audiosource;
-            audiosource = Auric::Assets::makeAudioSource(path.c_str(), volume, maxDistance, falloff, loop);
+            audiosource = Assets::makeAudioSource(path.c_str(), volume, maxDistance, falloff, loop);
             owner->addComponent(std::move(audiosource));
 
             break;
         }
 
-        case Auric::Constants::SCRIPTID: {
+        case Constants::SCRIPTID: {
             const std::string path = node.value("path", "");
 
             std::unique_ptr<ScriptComponent> script;
-            script = Auric::Assets::makeScript(path);
+            script = Assets::makeScript(path);
             owner->addComponent(std::move(script));
 
             break;
@@ -210,7 +212,7 @@ static std::unique_ptr<UIElement> buildUIElement(const json& node, UIElement* pa
     const std::string tag  = node.value("tag", "");
     const json& t = node.at("uitransform");
 
-    UITransform transform{t.at(0).get<float>() * Auric::Render::SW, t.at(1).get<float>() * Auric::Render::SH,
+    UITransform transform{t.at(0).get<float>() * Render::SW, t.at(1).get<float>() * Render::SH,
                           t.at(2).get<float>(), t.at(3).get<float>(), t.at(4).get<float>()};
 
     std::unique_ptr<UIElement> ui;
@@ -282,8 +284,8 @@ int loadScene(const char* path)
         json scene;
         file >> scene;
 
-        Auric::Lighting::ambient = scene.value("ambient", 0.0f);
-        Auric::Lighting::lightmapResScalar = scene.value("lightmapResScalar", 0.01f);
+        Lighting::ambient = scene.value("ambient", 0.0f);
+        Lighting::lightmapResScalar = scene.value("lightmapResScalar", 0.01f);
 
         for (const json& node : scene.value("objects", json::array()))
         {
@@ -297,7 +299,7 @@ int loadScene(const char* path)
         }
         for (const json& node : scene.value("fonts", json::array()))
         {
-            Font f = Auric::UI::bakeFont(
+            Font f = UI::bakeFont(
                 node.at("ttfpath").get<std::string>().c_str(),
                 node.value("pixelheight", 32.0f)
             );
@@ -313,7 +315,7 @@ int loadScene(const char* path)
             attachScript(nullptr, path);
 
         rootObjs = std::move(tempObjs);
-        Auric::Lighting::lights = tempLights;
+        Lighting::lights = tempLights;
         for (Font& f : fonts) glDeleteTextures(1, &f.atlas);
         fonts = tempFonts;
         uiRoots = std::move(tempUI);
@@ -334,12 +336,12 @@ int swapScene(const char* path)
     uiRoots.clear();
     resetScripting();
     rootObjs.clear();
-    Auric::Audio::uninitSounds();
+    Audio::uninitSounds();
     currentCam = nullptr;
-    Auric::Lighting::ambient = 0.0f;
-    Auric::Lighting::lightmapResScalar = 0.01;
-    for (Light* l : Auric::Lighting::lights) delete l;
-    Auric::Lighting::lights.clear();
+    Lighting::ambient = 0.0f;
+    Lighting::lightmapResScalar = 0.01;
+    for (Light* l : Lighting::lights) delete l;
+    Lighting::lights.clear();
 
     if (!loadScene(path)) return 0;
     loadScripts();

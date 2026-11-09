@@ -1,15 +1,22 @@
 #define STB_TRUETYPE_IMPLEMENTATION
 #include <stb/stb_truetype.h>
 
-#include "../include/graphics.h"
-#include "../include/ui.h"
+#include "include/render/graphics.h"
+#include "include/render/window.h"
+#include "include/ui/ui.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 #include <fstream>
 #include <sstream>
+#include <iostream>
 
+
+using namespace Auric;
+
+namespace Auric::UI
+{
 
 unsigned int uiProgram;
 
@@ -61,7 +68,7 @@ void main() {
 void buildUIProgram()
 {
 
-    uiProgram = linkShaderProgram(uiVertShader, uiFragShader);
+    uiProgram = Render::linkShaderProgram(uiVertShader, uiFragShader);
 
     uiModelLoc      = glGetUniformLocation(uiProgram, "model");
     uiProjectionLoc = glGetUniformLocation(uiProgram, "projection");
@@ -75,8 +82,8 @@ void beginUI()
     glUseProgram(uiProgram);
 
     glm::mat4 projection = glm::ortho(
-        0.0f, (float)SW,
-        (float)SH, 0.0f,
+        0.0f, (float)Render::SW,
+        (float)Render::SH, 0.0f,
         -1.0f, 1.0f
     );
 
@@ -244,6 +251,8 @@ void layoutText(UIText& t)
     t.setIndices(idx);
 }
 
+}
+
 UIElement* findUIElement(const std::string& name,
                          const std::vector<std::unique_ptr<UIElement>>& elements)
 {
@@ -329,7 +338,7 @@ void UIText::ComposeUI()
 {
     UIElement::ComposeUI();
 
-    layoutText(*this);
+    UI::layoutText(*this);
 
     glBindVertexArray(this->VAO);
 
@@ -354,8 +363,8 @@ void UIElement::DrawUI()
 void UIImage::DrawUI()
 {
     if (!draw) return;
-    glUniformMatrix3fv(uiModelLoc, 1, GL_FALSE, glm::value_ptr(this->getWorld()));
-    glUniform1i(uiTextModeLoc, 0);
+    glUniformMatrix3fv(UI::uiModelLoc, 1, GL_FALSE, glm::value_ptr(this->getWorld()));
+    glUniform1i(UI::uiTextModeLoc, 0);
 
     glBindTexture(GL_TEXTURE_2D, this->texture);
     glBindVertexArray(this->VAO);
@@ -367,14 +376,14 @@ void UIImage::DrawUI()
 void UIText::DrawUI()
 {
     if (!draw) return;
-    if (this->fontIndex < 0 || (size_t)this->fontIndex >= fonts.size() || this->indices.empty())
+    if (this->fontIndex < 0 || (size_t)this->fontIndex >= UI::fonts.size() || this->indices.empty())
     { UIElement::DrawUI(); return; }
 
-    glUniformMatrix3fv(uiModelLoc, 1, GL_FALSE, glm::value_ptr(this->getWorld()));
-    glUniform1i(uiTextModeLoc, 1);
-    glUniform3fv(uiTextColorLoc, 1, glm::value_ptr(this->color));
+    glUniformMatrix3fv(UI::uiModelLoc, 1, GL_FALSE, glm::value_ptr(this->getWorld()));
+    glUniform1i(UI::uiTextModeLoc, 1);
+    glUniform3fv(UI::uiTextColorLoc, 1, glm::value_ptr(this->color));
 
-    glBindTexture(GL_TEXTURE_2D, fonts[fontIndex].atlas);
+    glBindTexture(GL_TEXTURE_2D, UI::fonts[fontIndex].atlas);
     glBindVertexArray(this->VAO);
     glDrawElements(GL_TRIANGLES, (GLsizei)this->indices.size(), GL_UNSIGNED_INT, 0);
 

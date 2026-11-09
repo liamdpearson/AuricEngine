@@ -1,6 +1,6 @@
 #pragma once
 
-#include "include/scripting/scripts.h"
+#include "include/core/scripts.h"
 #include <lua/lua.hpp>
 #include <sol/sol.hpp>
 

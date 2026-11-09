@@ -1,12 +1,11 @@
-#include "../include/raycast.h"
-
-#include "../include/graphics.h"
+#include "include/physics/raycast.h"
 
 #include <glm/glm.hpp>
 
 #include <vector>
 #include <algorithm>
 #include <memory>
+
 
 static bool rayHitTri(const glm::vec3& origin, const glm::vec3& dir,
                       float maxDist, const Tri& t)

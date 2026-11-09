@@ -3,6 +3,8 @@
 #include "include/core/audio.h"
 
 
+using namespace Auric;
+
 // define scene variables
 std::vector<std::unique_ptr<Object>> rootObjs;
 
@@ -35,5 +37,5 @@ LightMapComponent::~LightMapComponent()
 
 AudioSourceComponent::~AudioSourceComponent()
 {
-    Auric::Audio::uninitializeAudioSource(this);
+    Audio::uninitializeAudioSource(this);
 }

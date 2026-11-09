@@ -95,7 +95,7 @@ class UIImage : public UIElement
     public:
         UIImage(const UITransform& transform, const char* path)
         {
-            std::pair<int, int> dimensions = textureDimensions(path);
+            std::pair<int, int> dimensions = Auric::Render::textureDimensions(path);
             float width = dimensions.first, height = dimensions.second;
 
             std::vector<float> verts = {
@@ -112,7 +112,7 @@ class UIImage : public UIElement
             this->setVertices(verts);
             this->setIndices(idx);
             this->transform = transform;
-            this->setTexture(loadTexture(path, true));
+            this->setTexture(Auric::Render::loadTexture(path, true));
         }
 
         void UploadUI() override;
@@ -204,6 +204,9 @@ class UIText : public UIElement
         ~UIText() override;
 };
 
+namespace Auric::UI
+{
+
 extern unsigned int uiProgram;
 
 extern int uiModelLoc, uiProjectionLoc;
@@ -214,9 +217,6 @@ extern std::vector<Font> fonts;
 
 extern const char* uiVertShader;
 extern const char* uiFragShader;
-
-namespace Auric::UI
-{
 
 void buildUIProgram();
 

@@ -1,4 +1,4 @@
-#include "include/assets/assets.h"
+#include "include/scene/assets.h"
 
 #include <cassert>
 #include <glm/glm.hpp>                  // vec3, mat4, basic types
@@ -12,9 +12,11 @@
 
 #include "include/render/graphics.h"
 #include "include/scene/object.h"
-#include "include/assets/mesh.h"
+#include "include/scene/mesh.h"
 #include "include/types/animation.h"
 
+
+using namespace Auric;
 
 namespace Auric::Assets {
 
@@ -43,7 +45,7 @@ std::pair<std::unique_ptr<MeshComponent>, std::unique_ptr<RigComponent>> makeMes
 
     mesh->vertices = verts;
     mesh->indices  = idx;
-    mesh->texture  = loadTexture(texSrc, pixelated);
+    mesh->texture  = Render::loadTexture(texSrc, pixelated);
     mesh->indexCount = (GLsizei)idx.size();
 
     if (skel.inverseBind.size() > 0) {
