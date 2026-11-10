@@ -6,6 +6,11 @@
 #include "include/scene/object.h"
 
 
+using namespace Auric;
+
+namespace Auric::Physics
+{
+
 std::vector<TriAABB> colliders;
 
 // CLAUDE GENERATED FUNCTION
@@ -164,10 +169,44 @@ void resolveCapsuleCollisions(CapsuleColliderComponent* cap, float deltaTime)
     }
 }
 
+static AABB triBounds(const Tri& t)
+{
+    AABB box;
+    box.min = glm::min(glm::min(t.a, t.b), t.c);
+    box.max = glm::max(glm::max(t.a, t.b), t.c);
+    return box;
+}
+
+void collectMeshColliders(ColliderComponent* col, std::vector<TriAABB> out)
+{
+    Object* owner = col->owner;
+    MeshComponent* mesh = owner->getComponent<MeshComponent>();
+    if (!mesh) return;
+
+    const glm::mat4& w = owner->getWorld();
+    const std::vector<unsigned int>& indices = mesh->indices;
+    const std::vector<float>& vertices = mesh->vertices;
+
+    for (size_t i = 0; i + 2 < indices.size(); i += 3)
+    {
+        glm::vec3 corner[3];
+        for (int c = 0; c < 3; ++c)
+        {
+            size_t v = (size_t)indices[i + c] * Constants::VERTEX_FLOATS;
+            glm::vec3 local(vertices[v], vertices[v + 1], vertices[v + 2]);
+            corner[c] = glm::vec3(w * glm::vec4(local, 1.0f));
+        }
+        Tri tri{corner[0], corner[1], corner[2]};
+        AABB aabb = triBounds(tri);
+        TriAABB t{tri, aabb};
+        out.push_back(t);
+    }
+}
+
 void collectSceneColliders()
 {
     colliders.clear();
-    for (std::unique_ptr<Object>& obj : rootObjs) obj->CollectColliders(glm::mat4(1.0f), colliders);
+    // loop through and collect scene colliders
 
     std::vector<Tri*> colliderRefs;
     for (TriAABB& t : colliders)
@@ -187,7 +226,6 @@ void collectSceneColliders()
         }
     }
 
-
     rootNode = BVHnode{
         AABB{min, max},
         nullptr, nullptr,
@@ -197,7 +235,4 @@ void collectSceneColliders()
     splitBVHnode(&rootNode);
 }
 
-void Capsule::Compose()
-{
-    Object::Compose();
-}   
+}

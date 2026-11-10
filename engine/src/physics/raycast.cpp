@@ -7,6 +7,9 @@
 #include <memory>
 
 
+namespace Auric::Physics
+{
+
 static bool rayHitTri(const glm::vec3& origin, const glm::vec3& dir,
                       float maxDist, const Tri& t)
 {
@@ -183,4 +186,6 @@ void splitBVHnode(BVHnode* node)
 
     splitBVHnode(node->left.get());
     splitBVHnode(node->right.get());
+}
+
 }

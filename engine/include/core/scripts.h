@@ -6,12 +6,12 @@
 #include <string>
 
 
+namespace Auric::Scripting
+{
+
 struct ScriptInstance;
 
 extern std::vector<ScriptInstance> scripts;
-
-namespace Auric::Scripting
-{
 
 void attachScript(Object* obj, std::string path);
 

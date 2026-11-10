@@ -12,6 +12,11 @@
 #include <fstream>
 
 
+using namespace Auric;
+
+namespace Auric::Scripting
+{
+
 sol::state lua;
 
 std::vector<ScriptInstance> scripts;
@@ -136,7 +141,7 @@ static void registerLuaAPI()
         "height", &CapsuleColliderComponent::height,
         "radius", &CapsuleColliderComponent::radius,
         "velocity", &CapsuleColliderComponent::velocity,
-        "resolveCollisions", [](CapsuleColliderComponent* cap, float deltaTime) { resolveCapsuleCollisions(cap, deltaTime); }
+        "resolveCollisions", [](CapsuleColliderComponent* cap, float deltaTime) { Physics::resolveCapsuleCollisions(cap, deltaTime); }
     );
     lua.new_usertype<AudioSourceComponent>("AudioSource",
         "loop", &AudioSourceComponent::loop,
@@ -178,12 +183,12 @@ static void registerLuaAPI()
         return obj;
     });
     find.set_function("ui", [](const std::string& name) {
-        UIElement* ui = findUIElement(name, uiRoots);
+        UIElement* ui = findUIElement(name, UI::uiRoots);
         return uiToLua(ui);
     });
     sol::table raycast = lua.create_named_table("raycast");
     raycast.set_function("occluded", [](const glm::vec3& origin, const glm::vec3& dir, float maxDist) {
-        return rayOccluded(origin, dir, maxDist, rootNode);
+        return rayOccluded(origin, dir, maxDist, Physics::rootNode);
     });
     lua.set_function(
         "swapScene", [](const std::string& path) { Auric::Scene::pendingScene = path; }
@@ -292,4 +297,6 @@ void startScripts()
 void updateScripts()
 {
     for (const ScriptInstance& si : scripts) si.Update(deltaTime);
+}
+
 }

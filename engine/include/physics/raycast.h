@@ -7,6 +7,10 @@
 #include <vector>
 #include <memory>
 
+
+namespace Auric::Physics
+{
+
 struct BVHnode
 {
     AABB aabb;
@@ -20,3 +24,5 @@ bool rayOccluded(const glm::vec3& origin, const glm::vec3& dir,
                         float maxDist, const BVHnode& node);
 
 void splitBVHnode(BVHnode* node);
+
+}

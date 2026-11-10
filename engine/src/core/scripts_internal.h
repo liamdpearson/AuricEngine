@@ -4,6 +4,10 @@
 #include <lua/lua.hpp>
 #include <sol/sol.hpp>
 
+
+namespace Auric::Scripting
+{
+
 struct ScriptInstance
 {
     std::string path;
@@ -17,3 +21,5 @@ struct ScriptInstance
 };
 
 extern sol::state lua;
+
+}
