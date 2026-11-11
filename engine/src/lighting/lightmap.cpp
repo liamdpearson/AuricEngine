@@ -8,7 +8,6 @@
 #include "include/core/constants.h"
 #include "include/lighting/lighting.h"
 #include "include/scene/object.h"
-#include "include/types/primatives.h"
 #include "include/render/graphics.h"
 
 

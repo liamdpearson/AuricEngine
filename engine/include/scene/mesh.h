@@ -4,7 +4,7 @@
 
 #include <vector>
 
-#include "include/types/animation.h"
+#include "include/scene/animtypes.h"
 
 
 // loads .obj file

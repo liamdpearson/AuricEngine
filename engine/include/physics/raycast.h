@@ -1,6 +1,6 @@
 #pragma once
 
-#include "include/types/primatives.h"
+#include "include/physics/phystypes.h"
 
 #include <glm/glm.hpp>
 

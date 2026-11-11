@@ -6,7 +6,7 @@
 #include <utility>
 #include <string>
 
-#include "include/types/primatives.h"
+#include "include/physics/phystypes.h"
 #include "include/physics/raycast.h"
 
 
@@ -47,7 +47,7 @@ namespace Auric::Lighting
 extern std::vector<Light*> lights;
 extern float ambient;
 extern std::vector<Tri> occluders;
-extern BVHnode rootNode;
+extern Auric::Physics::BVHnode rootNode;
 extern LightGrid lightGrid;
 
 glm::vec3 sampleLightAt(const glm::vec3& p);

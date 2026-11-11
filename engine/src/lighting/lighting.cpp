@@ -1,4 +1,4 @@
-#include "/include/lighting/lighting.h"
+#include "include/lighting/lighting.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -19,7 +19,7 @@ namespace Auric::Lighting
 std::vector<Light*> lights;
 float ambient = 1.0f; // default value overriden in loadScene
 std::vector<Tri> occluders;
-BVHnode rootNode;
+Auric::Physics::BVHnode rootNode;
 LightGrid lightGrid;
 
 glm::vec3 sampleLightAt(const glm::vec3& p)

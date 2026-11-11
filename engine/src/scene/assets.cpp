@@ -13,7 +13,7 @@
 #include "include/render/graphics.h"
 #include "include/scene/object.h"
 #include "include/scene/mesh.h"
-#include "include/types/animation.h"
+#include "include/scene/animtypes.h"
 
 
 using namespace Auric;

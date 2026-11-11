@@ -1,12 +1,13 @@
-#include "include/audio.h"
-#include "include/collisions.h"
-#include "include/graphics.h"
-#include "include/input.h"
-#include "include/lighting.h"
-#include "include/load.h"
-#include "include/scenes.h"
-#include "include/scripts.h"
-#include "include/ui.h"
+#include "include/core/audio.h"
+#include "include/core/input.h"
+#include "include/core/scripts.h"
+#include "include/lighting/lighting.h"
+#include "include/physics/collisions.h"
+#include "include/render/graphics.h"
+#include "include/render/window.h"
+#include "include/scene/load.h"
+#include "include/scene/object.h"
+#include "include/ui/ui.h"
 
 #include <iostream>
 #include <algorithm>
@@ -14,30 +15,32 @@
 #include <chrono>
 
 
+using namespace Auric;
+
 int main()
 {
     if (!glfwInit()) { std::cout << "Failed to init GLFW\n"; return -1; }
 
     GLFWmonitor* moniter = glfwGetPrimaryMonitor();
     const GLFWvidmode* mode = glfwGetVideoMode(moniter);
-    SW = mode->width; SH = mode->height;
+    Render::SW = mode->width; Render::SH = mode->height;
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    window = glfwCreateWindow(SW, SH, "Game Engine", moniter, NULL);
-    if (!window)
+    Render::window = glfwCreateWindow(Render::SW, Render::SH, "Game Engine", moniter, NULL);
+    if (!Render::window)
     {
         std::cout << "Failed to create GLFW window\n";
         glfwTerminate();
         return -1;
     }
-    glfwSetWindowPos(window, 0, 0);
-    glfwMakeContextCurrent(window);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetWindowPos(Render::window, 0, 0);
+    glfwMakeContextCurrent(Render::window);
+    glfwSetInputMode(Render::window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     if (glfwRawMouseMotionSupported())
-        glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+        glfwSetInputMode(Render::window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
@@ -45,41 +48,46 @@ int main()
         return -1;
     }
 
-    glViewport(0, 0, SW, SH);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glViewport(0, 0, Render::SW, Render::SH);
+    glfwSetFramebufferSizeCallback(Render::window, Render::framebuffer_size_callback);
 
     glEnable(GL_DEPTH_TEST);
 
     // build shader programs
-    buildShaderProgram();
-    buildUIProgram();
+    Render::buildShaderProgram();
+    UI::buildUIProgram();
 
     // set callbacks
-    glfwSetKeyCallback(window, keyCallback);
-    glfwSetCursorPosCallback(window, mouseMoveCallback);
-    glfwSetMouseButtonCallback(window, mouseButtonCallback);
+    glfwSetKeyCallback(Render::window, Input::keyCallback);
+    glfwSetCursorPosCallback(Render::window, Input::mouseMoveCallback);
+    glfwSetMouseButtonCallback(Render::window, Input::mouseButtonCallback);
 
     // load game config
-    loadConfig("assets/config.json");
+    Scene::loadConfig("assets/config.json");
 
     // load scene
-    if (!loadScene(startupScene.c_str())) return 0;
-    initScripting();
+    if (!Scene::loadScene(Scene::startupScene.c_str())) return 0;
+    Scripting::initScripting();
 
-    bakeSceneLighting();
-    collectSceneColliders();
-    if (!initAudio()) return 0;
+    // initial compose loop
+    forEachObj([](Object& obj) {
+        glm::mat4 parentWorld = obj.parent ? obj.parent->getWorld() : glm::mat4{1.0f};
+        obj.setWorld(parentWorld * obj.transform.matrix());
+    });
 
-    for (std::unique_ptr<Object>& obj : rootObjs) obj->Upload();
-    for (std::unique_ptr<UIElement>& ui : uiRoots) ui->UploadUI();
+    Lighting::bakeSceneLighting();
+    Physics::collectSceneColliders();
+    if (!Audio::initAudio()) return 0;
 
-    startScripts();
+    // upload meshes and ui
 
-    while(!glfwWindowShouldClose(window))
+    Scripting::startScripts();
+
+    while(!glfwWindowShouldClose(Render::window))
     {
         // wait for frame cap
-        currentFrameTime = std::chrono::high_resolution_clock::now();
-        std::chrono::duration<double> elapsed = currentFrameTime - lastFrameTime;
+        Render::currentFrameTime = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> elapsed = Render::currentFrameTime - Render::lastFrameTime;
 
         // double time_left = target_frame_duration - elapsed.count();
         //
@@ -99,24 +107,24 @@ int main()
         // }
 
         // set dt
-        lastFrameTime = currentFrameTime;
+        Render::lastFrameTime = Render::currentFrameTime;
         deltaTime = (float)(elapsed.count());
 
         // call update fn in scripts
-        updateScripts();
+        Scripting::updateScripts();
 
-        if (pendingScene != "") {
-            if (!swapScene(pendingScene.c_str())) return 0;
-            pendingScene = "";
+        if (Scene::pendingScene != "") {
+            if (!Scene::swapScene(Scene::pendingScene.c_str())) return 0;
+            Scene::pendingScene = "";
         }
 
-        if (keyHeld(GLFW_KEY_LEFT_ALT) && keyPressed(GLFW_KEY_F4))
-            glfwSetWindowShouldClose(window, true);
+        if (Input::keyHeld(GLFW_KEY_LEFT_ALT) && Input::keyPressed(GLFW_KEY_F4))
+            glfwSetWindowShouldClose(Render::window, true);
 
-        endFrameInput();
+        Input::endFrameInput();
 
-        for (std::unique_ptr<Object>& obj : rootObjs) obj->ComputePose(deltaTime);
-        for (std::unique_ptr<Object>& obj : rootObjs) obj->Compose();
+        // for (std::unique_ptr<Object>& obj : rootObjs) obj->ComputePose(deltaTime);
+        // for (std::unique_ptr<Object>& obj : rootObjs) obj->Compose();
 
         // render here
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
