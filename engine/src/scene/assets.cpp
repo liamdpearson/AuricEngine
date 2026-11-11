@@ -10,19 +10,20 @@
 #include <string>
 #include <iostream>
 
+#include "include/core/constants.h"
+#include "include/core/scripts.h"
 #include "include/render/graphics.h"
 #include "include/scene/object.h"
 #include "include/scene/mesh.h"
-#include "include/scene/animtypes.h"
 
 
 using namespace Auric;
 
 namespace Auric::Assets {
 
-std::pair<std::unique_ptr<MeshComponent>, std::unique_ptr<RigComponent>> makeMesh(const char* objSrc,
-                                                                                           const char* texSrc,
-                                                                                           bool pixelated)
+std::pair<std::unique_ptr<MeshComponent>, std::unique_ptr<RigComponent>> makeMesh(const char* objSrc, 
+                                                                                  const char* texSrc,
+                                                                                  bool pixelated, bool draw)
 {
     auto mesh = std::make_unique<MeshComponent>();
 
@@ -36,6 +37,9 @@ std::pair<std::unique_ptr<MeshComponent>, std::unique_ptr<RigComponent>> makeMes
         if (strcmp(file, ".fbx") == 0) {
             loadFbx(objSrc, verts, idx, skel, anims);
         }
+        else if (strcmp(file, ".obj") == 0) {
+            loadObj(objSrc, verts, idx);
+        }
         else {
             std::cout << "File type not recognized: " << objSrc << '\n';
         }
@@ -43,10 +47,12 @@ std::pair<std::unique_ptr<MeshComponent>, std::unique_ptr<RigComponent>> makeMes
         std::cout << "No file type: " << objSrc << '\n';
     }
 
+    mesh->cid = Auric::Constants::MESHID;
     mesh->vertices = verts;
     mesh->indices  = idx;
     mesh->texture  = Render::loadTexture(texSrc, pixelated);
     mesh->indexCount = (GLsizei)idx.size();
+    mesh->draw = draw;
 
     if (skel.inverseBind.size() > 0) {
         auto rig  = std::make_unique<RigComponent>();
@@ -55,6 +61,7 @@ std::pair<std::unique_ptr<MeshComponent>, std::unique_ptr<RigComponent>> makeMes
         rigObj.skeleton = skel;
         rigObj.animations = anims;
 
+        rig->cid = Auric::Constants::RIGID;
         rig->rig = rigObj;
 
         return std::make_pair(std::move(mesh), std::move(rig));
@@ -67,6 +74,7 @@ std::unique_ptr<CameraComponent> makeCamera(float FOV)
 {
     auto cam = std::make_unique<CameraComponent>();
 
+    cam->cid = Auric::Constants::CAMERAID;
     cam->FOV = FOV;
 
     return cam;
@@ -93,6 +101,7 @@ std::unique_ptr<RigComponent> makeRig(const char* path)
 
     Rig rigObj;
 
+    rig->cid = Auric::Constants::RIGID;
     rigObj.skeleton = skel;
     rigObj.animations = anims;
 
@@ -105,18 +114,7 @@ std::unique_ptr<LightMapComponent> makeLightMap()
 {
     auto lm = std::make_unique<LightMapComponent>();
 
-    // std::vector<float> verts = mesh->vertices;
-    // std::vector<unsigned int> idx = mesh->indices;
-    
-    // xatlas::Atlas* atlas = nullptr;
-    // float ogArea = getMeshArea(verts, idx);
-    // float scaledArea = (transform.scaleX * transform.scaleY +
-    //                     transform.scaleX * transform.scaleZ +
-    //                     transform.scaleY * transform.scaleZ) * ogArea;
-    // float resolution = std::sqrt(scaledArea * 64 * 64) * lightmapResScalar;
-    // if (!GenUV2(atlas, verts, idx, resolution)) atlas = nullptr;
-
-    // lm->atlas = atlas;
+    lm->cid = Auric::Constants::LIGHTMAPID;
 
     return lm;
 }
@@ -125,6 +123,8 @@ std::unique_ptr<ColliderComponent> makeCollider()
 {
     auto collider = std::make_unique<ColliderComponent>();
 
+    collider->cid = Auric::Constants::COLLIDERID;
+
     return collider;
 }
 
@@ -132,6 +132,7 @@ std::unique_ptr<CapsuleColliderComponent> makeCapsuleCollider(float radius = 0.3
 {
     auto capsuleCol = std::make_unique<CapsuleColliderComponent>();
 
+    capsuleCol->cid = Auric::Constants::CAPSULECOLLIDERID;
     capsuleCol->height = height;
     capsuleCol->radius = radius;
 
@@ -143,6 +144,7 @@ std::unique_ptr<AudioSourceComponent> makeAudioSource(const char* path, float vo
 {
     auto audioSource = std::make_unique<AudioSourceComponent>();
 
+    audioSource->cid = Auric::Constants::AUDIOSOURCEID;
     audioSource->path = path;
     audioSource->volume = volume;
     audioSource->maxDistance = maxDistance;
@@ -156,6 +158,7 @@ std::unique_ptr<ScriptComponent> makeScript(const std::string path)
 {
     auto script = std::make_unique<ScriptComponent>();
 
+    script->cid = Auric::Constants::SCRIPTID;
     script->path = path;
     
     return script;

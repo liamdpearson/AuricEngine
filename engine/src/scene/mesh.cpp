@@ -7,7 +7,7 @@
 #include <iostream>
 #include <map>
 
-#include "include/scene/animtypes.h"
+#include "include/core/animation.h"
 #include "include/core/constants.h"
 
 

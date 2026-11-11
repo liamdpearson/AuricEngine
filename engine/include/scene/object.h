@@ -11,7 +11,7 @@
 #include <xatlas/xatlas.h>
                        
 #include "include/core/constants.h"
-#include "include/scene/animtypes.h"
+#include "include/core/animation.h"
 
 #include <vector>
 #include <string>
@@ -55,8 +55,8 @@ class Object;
 struct Component
 {
     Object* owner = nullptr;
+    unsigned int cid = 0;
     virtual ~Component() = default;
-    static inline const unsigned int CID = 0;
 };
 
 // A node in the scene hierarchy
@@ -86,7 +86,7 @@ class Object
         template <typename T>
         T* getComponent() const {
             for (auto& c : components)
-                if (T::CID == c->CID) {
+                if (T::CID == c->cid) {
                     T* t = static_cast<T*>(c.get());
                     return t;
                 }
@@ -125,6 +125,8 @@ struct MeshComponent : Component
 
     GLsizei indexCount = 0;
     unsigned int VAO = 0, VBO = 0, EBO = 0;
+
+    bool draw = true;
 
     ~MeshComponent() override;
 };

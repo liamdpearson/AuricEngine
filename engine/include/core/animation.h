@@ -9,10 +9,6 @@
 #include <string>
 
 
-// maximum bones because I store bone indices as a single
-// unsigned int so each bone has to be less than 8 bits.
-const int MAX_BONES = 128;
-
 // all vectors are of the same length bone owns each at its index
 struct Skeleton
 {
@@ -105,3 +101,10 @@ struct Rig
         return -1;
     }
 };
+
+namespace Auric::Animate
+{
+
+void computePose(Rig& rig);
+
+}

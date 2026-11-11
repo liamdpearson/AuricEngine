@@ -12,8 +12,6 @@ extern BVHnode rootNode;
 
 void resolveCapsuleCollisions(CapsuleColliderComponent* cap, float deltaTime);
 
-void collectMeshColliders(ColliderComponent* col, std::vector<TriAABB> out);
-
 void collectSceneColliders();
 
 }

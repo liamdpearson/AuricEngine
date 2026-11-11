@@ -10,8 +10,12 @@
 #include <algorithm>
 #include <utility>
 
+#include "include/lighting/lightmap.h"
 #include "include/scene/object.h"
+#include "include/physics/collisions.h"
 
+
+using namespace Auric;
 
 namespace Auric::Lighting
 {
@@ -19,7 +23,7 @@ namespace Auric::Lighting
 std::vector<Light*> lights;
 float ambient = 1.0f; // default value overriden in loadScene
 std::vector<Tri> occluders;
-Auric::Physics::BVHnode rootNode;
+BVHnode rootNode;
 LightGrid lightGrid;
 
 glm::vec3 sampleLightAt(const glm::vec3& p)
@@ -35,7 +39,7 @@ glm::vec3 sampleLightAt(const glm::vec3& p)
             if (dist < 0.00001f || dist > light->radius) continue;
             glm::vec3 dir = glm::normalize(toLight);
 
-            if (rayOccluded(p, dir, dist, rootNode)) continue;
+            if (Physics::rayOccluded(p, dir, dist, rootNode)) continue;
             
             float a = 1/(1+(dist/light->falloff)*(dist/light->falloff));
             float b = 1/(1+(light->radius/light->falloff)*(light->radius/light->falloff));
@@ -56,7 +60,7 @@ glm::vec3 sampleLightAt(const glm::vec3& p)
                 if (dist > light->radius) continue;
                 glm::vec3 dir = glm::normalize(toLight);
 
-                if (rayOccluded(p, dir, dist, rootNode)) continue;
+                if (Physics::rayOccluded(p, dir, dist, rootNode)) continue;
                 
                 float a = 1/(1+(dist/light->falloff)*(dist/light->falloff));
                 float b = 1/(1+(light->radius/light->falloff)*(light->radius/light->falloff));
@@ -90,7 +94,7 @@ std::pair<glm::vec3, glm::vec3> sampleLightAndDir(const glm::vec3& p)
             if (dist < 0.00001f || dist > light->radius) continue;
             glm::vec3 d = glm::normalize(toLight);
 
-            if (rayOccluded(p, d, dist, rootNode)) continue;
+            if (Physics::rayOccluded(p, d, dist, rootNode)) continue;
             
             float a = 1/(1+(dist/light->falloff)*(dist/light->falloff));
             float b = 1/(1+(light->radius/light->falloff)*(light->radius/light->falloff));
@@ -112,7 +116,7 @@ std::pair<glm::vec3, glm::vec3> sampleLightAndDir(const glm::vec3& p)
                 if (dist < 0.00001f || dist > light->radius) continue;
                 glm::vec3 d = glm::normalize(toLight);
 
-                if (rayOccluded(p, d, dist, rootNode)) continue;
+                if (Physics::rayOccluded(p, d, dist, rootNode)) continue;
                 
                 float a = 1/(1+(dist/light->falloff)*(dist/light->falloff));
                 float b = 1/(1+(light->radius/light->falloff)*(light->radius/light->falloff));
@@ -223,6 +227,28 @@ std::pair<glm::vec3, glm::vec3> gridLightAt(const glm::vec3& p)
     return std::pair<glm::vec3, glm::vec3>{lit, dir};
 }
 
+static void collectMeshOccluders(MeshComponent* mesh, std::vector<Tri>& out)
+{
+    Object* owner = mesh->owner;
+    if (!mesh) return;
+
+    const glm::mat4& w = owner->getWorld();
+    const std::vector<unsigned int>& indices = mesh->indices;
+    const std::vector<float>& vertices = mesh->vertices;
+
+    for (size_t i = 0; i + 2 < indices.size(); i += 3)
+    {
+        glm::vec3 corner[3];
+        for (int c = 0; c < 3; ++c)
+        {
+            size_t v = (size_t)indices[i + c] * Constants::VERTEX_FLOATS;
+            glm::vec3 local(vertices[v], vertices[v + 1], vertices[v + 2]);
+            corner[c] = glm::vec3(w * glm::vec4(local, 1.0f));
+        }
+        Tri t{corner[0], corner[1], corner[2]};
+        out.push_back(t);
+    }
+}
 
 // original bake lighting call
 void bakeSceneLighting()
@@ -231,8 +257,14 @@ void bakeSceneLighting()
     lightGrid = LightGrid{};
 
     // collect light occluder triangles
-    // for (std::unique_ptr<Object>& obj : rootObjs)
-    //     obj->CollectOccluders(glm::mat4(1.0f), occluders);
+    forEachObj([](Object& obj) {
+        MeshComponent* mesh = obj.getComponent<MeshComponent>();
+        if (!mesh) return;
+        LightMapComponent* lm = obj.getComponent<LightMapComponent>();
+        if (!lm) return;
+
+        collectMeshOccluders(mesh, occluders);
+    });
     
     std::cout << "baked " << occluders.size() << " occluder Tris"  << '\n';
 
@@ -267,7 +299,7 @@ void bakeSceneLighting()
         occluderRefs,
         false
     };
-    splitBVHnode(&rootNode);
+    Physics::splitBVHnode(&rootNode);
 
     std::cout << "Light Grid Dimensions(-X X -Y Y -Z Z):\n";
     std::cout << min.x << ' ' << min.y << ' ' << min.z << ' ' 
@@ -286,9 +318,15 @@ void bakeSceneLighting()
         }
     }
 
-    // bake lighting
-    // for (std::unique_ptr<Object>& obj : rootObjs)
-    //     obj->BakeLighting(glm::mat4(1.0f));
+    // initialize and bake lightmaps
+    forEachObj([](Object& obj) {
+        MeshComponent* mesh = obj.getComponent<MeshComponent>();
+        if (!mesh) return;
+        LightMapComponent* lm = obj.getComponent<LightMapComponent>();
+        if (!lm) return;
+
+        Lighting::initializeLightmap(lm, mesh);
+    });
 }
 
 }

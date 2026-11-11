@@ -11,8 +11,6 @@
 #include "include/render/graphics.h"
 
 
-const int UI_FLOATS = 4;
-
 struct UITransform
 {
     float x, y;

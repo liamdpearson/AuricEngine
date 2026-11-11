@@ -13,13 +13,14 @@
                     "ID": 1,
                     "meshpath": "assets/objects/testing_zone/testing_zone.obj",
                     "texpath": "assets/objects/testing_zone/testing_zone.png",
-                    "pixelated": true
+                    "pixelated": true,
+                    "draw": true
                 },
                 {
-                    "ID": "5"
+                    "ID": 5
                 },
                 {
-                    "ID": "4"
+                    "ID": 4
                 }
             ],
             "parentbonename": "",
@@ -44,7 +45,7 @@
                 },
                 {
                     "ID": 8,
-                    "path": "assets/scripts/player.lua"
+                    "path": "assets/scripts/sound.lua"
                 }
             ],
             "parentbonename": "",
@@ -118,7 +119,8 @@
                                     "ID": 1,
                                     "meshpath": "assets/objects/glock/glocknhands.fbx",
                                     "texpath": "assets/objects/glock/glocknhands.png",
-                                    "pixelated": true
+                                    "pixelated": true,
+                                    "draw": true
                                 },
                                 {
                                     "ID": 8,

@@ -59,6 +59,7 @@ static bool GenUV2(xatlas::Atlas*& atlas, std::vector<float>& verts,
     {
         std::cout << "Error adding mesh: " << xatlas::StringForEnum(error) << '\n';
         xatlas::Destroy(atlas);
+        atlas = nullptr;
         return false;
     }
 
@@ -123,7 +124,7 @@ static float cross2D(const glm::vec2& a, const glm::vec2& b)
 // calculates the light value for each texel in the static meshes
 // light map. then it creates the light map texture and sets it as
 // the static meshes light map. finally, it calls Object::BakeLighting.
-static void bakeLightmapLighting(LightMapComponent* lm, MeshComponent* mesh)
+static void bakeLightmap(LightMapComponent* lm, MeshComponent* mesh)
 {
     glm::mat4 world = lm->owner->getWorld();
     glm::mat3 normalMat = glm::mat3(glm::transpose(glm::inverse(world)));
@@ -214,7 +215,7 @@ static void bakeLightmapLighting(LightMapComponent* lm, MeshComponent* mesh)
                         if (lambert <= 0) continue;
 
                         glm::vec3 origin = worldPos + worldNorm * 1e-3f; // shadow bias
-                        if (rayOccluded(origin, dir, dist, rootNode)) continue;
+                        if (Physics::rayOccluded(origin, dir, dist, rootNode)) continue;
                         
                         float a = 1/(1+(dist/light->falloff)*(dist/light->falloff));
                         float b = 1/(1+(light->radius/light->falloff)*(light->radius/light->falloff));
@@ -240,7 +241,7 @@ static void bakeLightmapLighting(LightMapComponent* lm, MeshComponent* mesh)
                             if (lambert <= 0) continue;
 
                             glm::vec3 origin = worldPos + worldNorm * 1e-3f; // shadow bias
-                            if (rayOccluded(origin, dir, dist, rootNode)) continue;
+                            if (Physics::rayOccluded(origin, dir, dist, rootNode)) continue;
                             
                             float a = 1/(1+(dist/light->falloff)*(dist/light->falloff));
                             float b = 1/(1+(light->radius/light->falloff)*(light->radius/light->falloff));
@@ -311,7 +312,6 @@ static void bakeLightmapLighting(LightMapComponent* lm, MeshComponent* mesh)
 
 void initializeLightmap(LightMapComponent* lm, MeshComponent* mesh)
 {
-    xatlas::Atlas* atlas = lm->atlas;
     std::vector<float>& verts = mesh->vertices;
     std::vector<unsigned int>& idx = mesh->indices;
     const Transform& transform = lm->owner->transform;
@@ -321,7 +321,9 @@ void initializeLightmap(LightMapComponent* lm, MeshComponent* mesh)
                         transform.scaleX * transform.scaleZ +
                         transform.scaleY * transform.scaleZ) * ogArea;
     float resolution = std::sqrt(scaledArea * 64 * 64) * lightmapResScalar;
-    if (!GenUV2(atlas, verts, idx, resolution)) atlas = nullptr;
+    if (!GenUV2(lm->atlas, verts, idx, resolution)) return;
+    
+    bakeLightmap(lm, mesh);
 }
 
 }

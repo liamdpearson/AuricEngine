@@ -7,9 +7,10 @@
 
 namespace Auric::Assets {
 
-std::pair<std::unique_ptr<MeshComponent>, std::unique_ptr<RigComponent>> makeMesh(const char* objSrc,
-                                                                                           const char* texSrc,
-                                                                                           bool pixelated);
+std::pair<std::unique_ptr<MeshComponent>, std::unique_ptr<RigComponent>> makeMesh(const char* objSrc, 
+                                                                                  const char* texSrc,
+                                                                                  bool pixelated, bool draw);
+
 std::unique_ptr<CameraComponent> makeCamera(float FOV);
 
 std::unique_ptr<RigComponent> makeRig(const char* path);

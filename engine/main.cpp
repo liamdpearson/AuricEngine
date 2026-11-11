@@ -71,15 +71,47 @@ int main()
 
     // initial compose loop
     forEachObj([](Object& obj) {
-        glm::mat4 parentWorld = obj.parent ? obj.parent->getWorld() : glm::mat4{1.0f};
-        obj.setWorld(parentWorld * obj.transform.matrix());
+        if (!obj.parent) {
+            obj.setWorld(obj.transform.matrix());
+        } else {
+            glm::mat4 parentWorld = obj.parent->getWorld();
+
+            int boneIndex = obj.getBoneIndex();
+            RigComponent* parentRig = boneIndex > -1 ? obj.parent->getComponent<RigComponent>() : nullptr;
+            Rig* rig = parentRig ? &parentRig->rig : nullptr;
+
+            if (rig && boneIndex < (int)rig->boneWorlds.size()) {
+
+                obj.setWorld(parentWorld * rig->boneWorlds[boneIndex] * obj.transform.matrix());
+
+            } else {
+                obj.setWorld(parentWorld * obj.transform.matrix());
+            }
+        }
+
+        // update cameras
+        CameraComponent* cam = obj.getComponent<CameraComponent>();
+        if (cam) {
+            glm::mat4 w = obj.getWorld();
+            cam->pos = glm::vec3(w[3]);
+            cam->front = glm::normalize(-glm::vec3(w[2]));
+            cam->up    = glm::normalize(glm::vec3(w[1]));
+        }
     });
 
     Lighting::bakeSceneLighting();
     Physics::collectSceneColliders();
+
     if (!Audio::initAudio()) return 0;
 
-    // upload meshes and ui
+    // upload mesh components
+    forEachObj([](Object& obj) {
+        MeshComponent* mesh = obj.getComponent<MeshComponent>();
+        if (mesh) Render::uploadMesh(mesh);
+    });
+
+    // upload ui objects
+    for (std::unique_ptr<UIElement>& ui : UI::uiRoots) ui->UploadUI();
 
     Scripting::startScripts();
 
@@ -123,35 +155,116 @@ int main()
 
         Input::endFrameInput();
 
-        // for (std::unique_ptr<Object>& obj : rootObjs) obj->ComputePose(deltaTime);
-        // for (std::unique_ptr<Object>& obj : rootObjs) obj->Compose();
+        // compute poses for rigs
+        forEachObj([](Object& obj) {
+            RigComponent* r = obj.getComponent<RigComponent>();
+            if (!r) return;
+            Rig& rig = r->rig;
+
+            rig.animTime += deltaTime * rig.animSpeed;
+            if (rig.nextAnim != -1) {
+                if (rig.animations[rig.currentAnim].duration - rig.animTime <= 0) // if cur anim done
+                    { rig.setAnim(rig.nextAnim, 0.1f); rig.nextAnim = -1; }
+            }
+            if (rig.blendDuration > 0.0f) rig.blendElapsed += deltaTime;
+            Animate::computePose(rig);
+        });
+
+        // compose objects
+        forEachObj([](Object& obj) {
+            if (!obj.parent) {
+                obj.setWorld(obj.transform.matrix());
+            } else {
+                glm::mat4 parentWorld = obj.parent->getWorld();
+
+                int boneIndex = obj.getBoneIndex();
+                RigComponent* parentRig = boneIndex > -1 ? obj.parent->getComponent<RigComponent>() : nullptr;
+                Rig* rig = parentRig ? &parentRig->rig : nullptr;
+
+                if (rig && boneIndex < (int)rig->boneWorlds.size()) {
+
+                    obj.setWorld(parentWorld * rig->boneWorlds[boneIndex] * obj.transform.matrix());
+
+                } else {
+                    obj.setWorld(parentWorld * obj.transform.matrix());
+                }
+            }
+
+            // update cameras
+            CameraComponent* cam = obj.getComponent<CameraComponent>();
+            if (cam) {
+                glm::mat4 w = obj.getWorld();
+                cam->pos = glm::vec3(w[3]);
+                cam->front = glm::normalize(-glm::vec3(w[2]));
+                cam->up    = glm::normalize(glm::vec3(w[1]));
+            }
+        });
 
         // render here
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClearColor(0.2f, 0.1f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glUseProgram(shaderProgram);
+        glUseProgram(Render::shaderProgram);
         if (currentCam) {
-            configureCamera(currentCam);
-            updateAudio(currentCam->getPos(),
-                        currentCam->getFront(),
-                        currentCam->getUp());
+            Render::configureCamera(currentCam);
+            Audio::updateAudio(currentCam->pos,
+                        currentCam->front,
+                        currentCam->up);
         }
 
-        for (std::unique_ptr<Object>& obj : rootObjs) obj->Draw();
+        // draw loop
+        forEachObj([](Object& obj) {
+            MeshComponent* mesh = obj.getComponent<MeshComponent>();
+            if (!mesh) return;
+            if (!mesh->draw) return;
+
+            glm::mat4 w = obj.getWorld();
+            glm::mat3 normalMat = glm::mat3(glm::transpose(glm::inverse(w)));
+            glUniformMatrix4fv(Render::modelLoc, 1, GL_FALSE, glm::value_ptr(w));
+            glUniformMatrix3fv(Render::normalMatLoc, 1, GL_FALSE, glm::value_ptr(normalMat));
+
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, mesh->texture);
+            glUniform1i(Render::texLoc, 0);
+
+            LightMapComponent* lm = obj.getComponent<LightMapComponent>();
+            if (lm) {
+                glUniform1i(Render::lightModeLoc, 1);
+
+                glActiveTexture(GL_TEXTURE1);
+                glBindTexture(GL_TEXTURE_2D, lm->lightMap);
+                glUniform1i(Render::lightMapLoc, 1);
+            } else {
+                glUniform1i(Render::lightModeLoc, 0);
+
+                std::pair<glm::vec3, glm::vec3> litAndDir = Lighting::gridLightAt(glm::vec3(w[3][0], w[3][1], w[3][2]));
+                glUniform3fv(Render::objectLightLoc, 1, glm::value_ptr(litAndDir.first));
+                glUniform3fv(Render::lightDirLoc,    1, glm::value_ptr(litAndDir.second));
+            }
+
+            RigComponent* r = obj.getComponent<RigComponent>();
+            if (r) {
+                GLsizei count = (GLsizei)std::min((size_t)Constants::MAX_BONES, r->rig.palette.size());
+                glUniformMatrix4fv(Render::boneMatricesLoc, count, GL_FALSE, glm::value_ptr(r->rig.palette[0]));
+            }
+
+            glBindVertexArray(mesh->VAO);
+            glDrawElements(GL_TRIANGLES, mesh->indexCount, GL_UNSIGNED_INT, 0);
+        });
+
         glBindVertexArray(0);
 
-        beginUI();
+        UI::beginUI();
 
-        for (std::unique_ptr<UIElement>& ui : uiRoots) ui->ComposeUI();
-        for (std::unique_ptr<UIElement>& ui : uiRoots) ui->DrawUI();
+        for (std::unique_ptr<UIElement>& ui : UI::uiRoots) ui->ComposeUI();
+        for (std::unique_ptr<UIElement>& ui : UI::uiRoots) ui->DrawUI();
 
-        endUI();
+        UI::endUI();
         
-        glfwSwapBuffers(window);
+        glfwSwapBuffers(Render::window);
         glfwPollEvents();
     }
 
-    uninitAudio();
+    Audio::uninitAudio();
     glfwTerminate();
     return 0;
 }

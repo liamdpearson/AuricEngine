@@ -273,4 +273,43 @@ void configureCamera(CameraComponent*& cam)
     glUniformMatrix4fv(viewLoc,       1, GL_FALSE, glm::value_ptr(view));
 }
 
+void uploadMesh(MeshComponent* mesh)
+{
+    glGenVertexArrays(1, &mesh->VAO);
+    glGenBuffers(1, &mesh->VBO);
+    glGenBuffers(1, &mesh->EBO);
+
+    glBindVertexArray(mesh->VAO); // start recording into the VAO
+
+    glBindBuffer(GL_ARRAY_BUFFER, mesh->VBO);
+    glBufferData(GL_ARRAY_BUFFER, 
+            mesh->vertices.size() * sizeof(float), 
+            mesh->vertices.data(), GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 
+            mesh->indices.size() * sizeof(unsigned int), 
+            mesh->indices.data(), GL_STATIC_DRAW);
+
+    const GLsizei stride = Constants::VERTEX_FLOATS * sizeof(float);
+    // pos
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
+    glEnableVertexAttribArray(0);
+    // uv
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+    // norm
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void*)(5 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+    // uv2
+    glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, stride, (void*)(8 * sizeof(float)));
+    glEnableVertexAttribArray(3);
+    // bone indices
+    glVertexAttribIPointer(4, 1, GL_UNSIGNED_INT, stride, (void*)(10 * sizeof(float)));
+    glEnableVertexAttribArray(4);
+    // bone weights
+    glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, stride, (void*)(11 * sizeof(float)));
+    glEnableVertexAttribArray(5);
+}
+
 }

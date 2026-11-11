@@ -7,11 +7,15 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <memory>
 
 #include "include/core/constants.h"
 #include "include/core/audio.h"
+#include "include/core/scripts.h"
 #include "include/lighting/lighting.h"
 #include "include/lighting/lightmap.h"
+#include "include/physics/collisions.h"
+#include "include/render/graphics.h"
 #include "include/render/window.h"
 #include "include/scene/object.h"
 #include "include/scene/assets.h"
@@ -31,13 +35,14 @@ static void buildComponent(const json& node, Object* owner)
             const std::string meshpath = node.value("meshpath", "");
             const std::string texpath = node.value("texpath", "");
             const bool pixelated = node.value("pixelated", false); 
+            const bool draw = node.value("draw", true); 
 
             std::pair<std::unique_ptr<MeshComponent>, std::unique_ptr<RigComponent>> pair;
-            pair = Assets::makeMesh(meshpath.c_str(), texpath.c_str(), pixelated);
+            pair = Assets::makeMesh(meshpath.c_str(), texpath.c_str(), pixelated, draw);
             
             owner->addComponent(std::move(pair.first));
             
-            if (pair.second != nullptr)
+            if (pair.second)
                 owner->addComponent(std::move(pair.second));
             
             break;
@@ -47,6 +52,7 @@ static void buildComponent(const json& node, Object* owner)
             const float FOV = node.value("FOV", 90.0f);
 
             std::unique_ptr<CameraComponent> cam = Assets::makeCamera(FOV);
+            if (node.value("isCurrent", false)) currentCam = cam.get();
             owner->addComponent(std::move(cam));
 
             break;
@@ -106,6 +112,7 @@ static void buildComponent(const json& node, Object* owner)
             std::unique_ptr<ScriptComponent> script;
             script = Assets::makeScript(path);
             owner->addComponent(std::move(script));
+            Scripting::attachScript(owner, path);
 
             break;
         }
@@ -123,8 +130,10 @@ static std::unique_ptr<Object> buildObject(const json& node, Object* parent)
                         t.at(3).get<float>(), t.at(4).get<float>(), t.at(5).get<float>(),
                         t.at(6).get<float>(), t.at(7).get<float>(), t.at(8).get<float>()};
     
-    std::unique_ptr<Object> obj;
-    obj->setName(name); obj->setTag(tag); obj->transform = transform;
+    std::unique_ptr<Object> obj = std::make_unique<Object>();
+    obj->setName(name); 
+    obj->setTag(tag); 
+    obj->transform = transform;
 
     for (const json& comp: node.value("components", json::array()))
         buildComponent(comp, obj.get());
@@ -312,13 +321,13 @@ int loadScene(const char* path)
         }
         // global scripts operate the same way as regular scripts just with no self object
         for (const std::string& path : scene.value("globalscripts", json::array()))
-            attachScript(nullptr, path);
+            Scripting::attachScript(nullptr, path);
 
         rootObjs = std::move(tempObjs);
         Lighting::lights = tempLights;
-        for (Font& f : fonts) glDeleteTextures(1, &f.atlas);
-        fonts = tempFonts;
-        uiRoots = std::move(tempUI);
+        for (Font& f : UI::fonts) glDeleteTextures(1, &f.atlas);
+        UI::fonts = tempFonts;
+        UI::uiRoots = std::move(tempUI);
     }
     catch(const json::exception& e)
     {
@@ -333,8 +342,8 @@ int loadScene(const char* path)
 
 int swapScene(const char* path)
 {
-    uiRoots.clear();
-    resetScripting();
+    UI::uiRoots.clear();
+    Scripting::resetScripting();
     rootObjs.clear();
     Audio::uninitSounds();
     currentCam = nullptr;
@@ -344,18 +353,18 @@ int swapScene(const char* path)
     Lighting::lights.clear();
 
     if (!loadScene(path)) return 0;
-    loadScripts();
+    Scripting::loadScripts();
 
     // this clears occluders and light grid
-    bakeSceneLighting();
+    Lighting::bakeSceneLighting();
 
     // this clears colliders
-    collectSceneColliders();
+    Physics::collectSceneColliders();
 
-    for (std::unique_ptr<Object>& obj : rootObjs) obj->Upload();
-    for (std::unique_ptr<UIElement>& ui : uiRoots) ui->UploadUI();
+    // for (std::unique_ptr<Object>& obj : rootObjs) obj->Upload();
+    // for (std::unique_ptr<UIElement>& ui : uiRoots) ui->UploadUI();
 
-    startScripts();
+    Scripting::startScripts();
 
     return 1;
 }
@@ -379,7 +388,7 @@ int loadConfig(const char* path)
         if (vsync) glfwSwapInterval(1);
         else glfwSwapInterval(0);
 
-        target_frame_duration = 1.0/scene.value("MAX_FPS", 60.0);
+        Render::target_frame_duration = 1.0/scene.value("MAX_FPS", 60.0);
     }
     catch(const json::exception& e)
     {

@@ -45,4 +45,8 @@ unsigned int loadTexture(const char* src, bool pixelated, bool clampEdge = false
 
 unsigned int loadLightMap(std::vector<glm::vec3>& pixels, int width, int height);
 
+void configureCamera(CameraComponent*& cam);
+
+void uploadMesh(MeshComponent* mesh);
+
 }

@@ -11,7 +11,7 @@ namespace Auric::Lighting
 
 extern float lightmapResScalar;
 
-void initializeLightmap(LightMapComponent* lm, const MeshComponent* mesh);
+void initializeLightmap(LightMapComponent* lm, MeshComponent* mesh);
 
 }
 

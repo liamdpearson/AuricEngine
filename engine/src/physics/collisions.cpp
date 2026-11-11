@@ -12,6 +12,7 @@ namespace Auric::Physics
 {
 
 std::vector<TriAABB> colliders;
+BVHnode rootNode;
 
 // CLAUDE GENERATED FUNCTION
 // Closest point to `p` on triangle t. The branches walk the triangle's Voronoi
@@ -177,10 +178,9 @@ static AABB triBounds(const Tri& t)
     return box;
 }
 
-void collectMeshColliders(ColliderComponent* col, std::vector<TriAABB> out)
+static void collectMeshColliders(MeshComponent* mesh, std::vector<TriAABB>& out)
 {
-    Object* owner = col->owner;
-    MeshComponent* mesh = owner->getComponent<MeshComponent>();
+    Object* owner = mesh->owner;
     if (!mesh) return;
 
     const glm::mat4& w = owner->getWorld();
@@ -206,7 +206,15 @@ void collectMeshColliders(ColliderComponent* col, std::vector<TriAABB> out)
 void collectSceneColliders()
 {
     colliders.clear();
-    // loop through and collect scene colliders
+
+    forEachObj([](Object& obj) {
+        MeshComponent* mesh = obj.getComponent<MeshComponent>();
+        if (!mesh) return;
+        ColliderComponent* col = obj.getComponent<ColliderComponent>();
+        if (!col) return;
+
+        collectMeshColliders(mesh, colliders);
+    });
 
     std::vector<Tri*> colliderRefs;
     for (TriAABB& t : colliders)

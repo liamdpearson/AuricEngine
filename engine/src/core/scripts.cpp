@@ -145,7 +145,13 @@ static void registerLuaAPI()
     );
     lua.new_usertype<AudioSourceComponent>("AudioSource",
         "loop", &AudioSourceComponent::loop,
-        "volume", &AudioSourceComponent::volume
+        "volume", &AudioSourceComponent::volume,
+        "Play", [](AudioSourceComponent* audiosource) {
+            Audio::playAudioSource(audiosource); 
+        },
+        "Stop", [](AudioSourceComponent* audiosource) {
+            Audio::stopAudioSource(audiosource); 
+        }
     );
     lua.create_named_table("input",
         "keyPressed",   &Auric::Input::keyPressed,
@@ -188,13 +194,13 @@ static void registerLuaAPI()
     });
     sol::table raycast = lua.create_named_table("raycast");
     raycast.set_function("occluded", [](const glm::vec3& origin, const glm::vec3& dir, float maxDist) {
-        return rayOccluded(origin, dir, maxDist, Physics::rootNode);
+        return Physics::rayOccluded(origin, dir, maxDist, Physics::rootNode);
     });
     lua.set_function(
         "swapScene", [](const std::string& path) { Auric::Scene::pendingScene = path; }
     );
     lua.set_function(
-        "playSound", [](const std::string& path, float vol) { Auric::Audio::playSound2D(path.c_str(), vol); }
+        "playSound2D", [](const std::string& path, float vol) { Auric::Audio::playSound2D(path.c_str(), vol); }
     );
     lua.set_function(
         "setMasterVolume", [](float vol) { Auric::Audio::setMasterVolume(vol); }

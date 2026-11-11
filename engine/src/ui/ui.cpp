@@ -1,6 +1,7 @@
 #define STB_TRUETYPE_IMPLEMENTATION
 #include <stb/stb_truetype.h>
 
+#include "include/core/constants.h"
 #include "include/render/graphics.h"
 #include "include/render/window.h"
 #include "include/ui/ui.h"
@@ -158,7 +159,7 @@ Font bakeFont(const char* path, float pixelHeight)
 static void pushGlyphQuad(std::vector<float>& verts, std::vector<unsigned int>& idx,
                           float x0, float y0, float x1, float y1, const Glyph& g)
 {
-    unsigned int base = (unsigned int)(verts.size() / UI_FLOATS);
+    unsigned int base = (unsigned int)(verts.size() / Constants::UI_FLOATS);
     verts.insert(verts.end(), { x0, y0, g.u0, g.v0 });
     verts.insert(verts.end(), { x1, y0, g.u1, g.v0 });
     verts.insert(verts.end(), { x1, y1, g.u1, g.v1 });
@@ -288,7 +289,7 @@ void UIImage::UploadUI()
              this->vertices.size() * sizeof(float),
              this->vertices.data(), GL_STATIC_DRAW);
 
-    const GLsizei stride = UI_FLOATS * sizeof(float);
+    const GLsizei stride = Constants::UI_FLOATS * sizeof(float);
     // pos
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, stride, (void*)0);
     glEnableVertexAttribArray(0);
@@ -312,7 +313,7 @@ void UIText::UploadUI()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->EBO);
     glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
 
-    const GLsizei stride = UI_FLOATS * sizeof(float);
+    const GLsizei stride = Constants::UI_FLOATS * sizeof(float);
     // pos
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, stride, (void*)0);
     glEnableVertexAttribArray(0);

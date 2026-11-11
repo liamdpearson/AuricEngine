@@ -1,28 +1,30 @@
 local ammo
+local rig
 
 function start()
-    self.rig:setAnim(0)
+    rig = self:getRig()
+    rig:setAnim(0)
     ammo = 17
 end
 
 function update(deltaTime)
-    if input.mousePressed(mouse.LEFT) and self.rig.currentAnim ~= 5 then
+    if input.mousePressed(mouse.LEFT) and rig.currentAnim ~= 5 then
         if ammo > 1 then
-            self.rig:setAnim(2, 0.01, 0)
+            rig:setAnim(2, 0.01, 0)
             ammo = ammo - 1
-            playSound("assets/sounds/gunshot.mp3", 1.0)
+            playSound2D("assets/sounds/gunshot.mp3", 1.0)
         elseif ammo == 1 then
-            self.rig:setAnim(3, 0.01, 1)
+            rig:setAnim(3, 0.01, 1)
             ammo = ammo - 1
-            playSound("assets/sounds/gunshot.mp3", 1.0)
+            playSound2D("assets/sounds/gunshot.mp3", 1.0)
         else
-            self.rig:setAnim(4, 0.05, 1)
-            playSound("assets/sounds/noammo.wav", 0.3)
+            rig:setAnim(4, 0.05, 1)
+            playSound2D("assets/sounds/noammo.wav", 0.3)
         end
     end
 
-    if input.keyPressed(key.R) and self.rig.currentAnim ~= 5 then
-        self.rig:setAnim(5, 0.05, 0)
+    if input.keyPressed(key.R) and rig.currentAnim ~= 5 then
+        rig:setAnim(5, 0.05, 0)
         ammo = 17
     end
 end

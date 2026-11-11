@@ -2,8 +2,10 @@ local cam1
 local cam2
 
 function start()
-    cam1 = find.obj("camera")
-    cam2 = find.obj("testcam")
+    camera = find.obj("camera")
+    cam1 = camera:getCamera()
+    testcam = find.obj("testcam")
+    cam2 = testcam:getCamera()
 end
 
 function update(deltaTime)

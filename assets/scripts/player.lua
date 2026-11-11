@@ -1,11 +1,15 @@
 local camnhands
+local rig
+local capsule
 local crosshair
 local walking
 local ads
 
 function start()
     camnhands = find.obj("camnhands")
-    camnhands.rig:setAnim(0)
+    rig = camnhands:getRig()
+    capsule = self:getCapsuleCollider()
+    rig:setAnim(0)
     crosshair = find.ui("crosshair")
     walking = false
     ads = false
@@ -59,30 +63,30 @@ function update(deltaTime)
     down = Vec3.new(0, -1, 0)
     grounded = raycast.occluded(pos, down, 0.2)
     if input.keyPressed(key.SPACE) and grounded then
-        self.velocity.y = self.velocity.y + 5.0
+        capsule.velocity.y = capsule.velocity.y + 5.0
     end
 
     moveDirLen = moveDir:length()
     if (moveDirLen > 0.0) then
         moveDir:normalize()
-        camnhands.rig.animSpeed = 1.5
+        rig.animSpeed = 1.5
         walking = true
     else
-        camnhands.rig.animSpeed = 1.0
+        rig.animSpeed = 1.0
         walking = false
     end
 
-    self.velocity.y = self.velocity.y - 9.81 * deltaTime
-    if (self.velocity.y < -50.0) then
-        self.velocity.y = -50.0
+    capsule.velocity.y = capsule.velocity.y - 9.81 * deltaTime
+    if (capsule.velocity.y < -50.0) then
+        capsule.velocity.y = -50.0
     end
 
     damping = 0.00005 ^ deltaTime
-    self.velocity.x = self.velocity.x * damping
-    self.velocity.z = self.velocity.z * damping
-    self.velocity = self.velocity + moveDir * acceleration
+    capsule.velocity.x = capsule.velocity.x * damping
+    capsule.velocity.z = capsule.velocity.z * damping
+    capsule.velocity = capsule.velocity + moveDir * acceleration
 
-    self:resolveCollisions(deltaTime)
+    capsule:resolveCollisions(deltaTime)
 
     if input.mousePressed(mouse.RIGHT) then
         ads = true
@@ -102,7 +106,7 @@ function update(deltaTime)
         a = 1
     end
     shouldBe = w + a * 2
-    if camnhands.rig.currentAnim ~= shouldBe then
-        camnhands.rig:setAnim(shouldBe, 0.1)
+    if rig.currentAnim ~= shouldBe then
+        rig:setAnim(shouldBe, 0.1)
     end
 end

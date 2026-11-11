@@ -1,11 +1,15 @@
+local sound
+
 function start()
+    testsound = find.obj("test sound")
+    sound = testsound:getAudioSource()
 end
 
 function update(deltaTime)
     if input.keyPressed(key.Y) then
-        self:play()
+        sound:Play()
     end
     if input.keyPressed(key.U) then
-        self:stop()
+        sound:Stop()
     end
 end

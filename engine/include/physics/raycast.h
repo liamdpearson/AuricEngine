@@ -1,15 +1,12 @@
 #pragma once
 
-#include "include/physics/phystypes.h"
+#include "include/physics/types.h"
 
 #include <glm/glm.hpp>
 
 #include <vector>
 #include <memory>
 
-
-namespace Auric::Physics
-{
 
 struct BVHnode
 {
@@ -19,6 +16,9 @@ struct BVHnode
     std::vector<Tri*> tris;
     bool isLeaf = false;
 };
+
+namespace Auric::Physics
+{
 
 bool rayOccluded(const glm::vec3& origin, const glm::vec3& dir,
                         float maxDist, const BVHnode& node);
