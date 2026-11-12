@@ -361,8 +361,14 @@ int swapScene(const char* path)
     // this clears colliders
     Physics::collectSceneColliders();
 
-    // for (std::unique_ptr<Object>& obj : rootObjs) obj->Upload();
-    // for (std::unique_ptr<UIElement>& ui : uiRoots) ui->UploadUI();
+    // upload mesh components
+    forEachObj([](Object& obj) {
+        MeshComponent* mesh = obj.getComponent<MeshComponent>();
+        if (mesh) Render::uploadMesh(mesh);
+    });
+
+    // upload ui objects
+    for (std::unique_ptr<UIElement>& ui : UI::uiRoots) ui->UploadUI();
 
     Scripting::startScripts();
 
