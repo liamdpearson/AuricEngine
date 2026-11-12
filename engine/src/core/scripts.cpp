@@ -1,3 +1,4 @@
+#include "include/physics/raycast.h"
 #include "scripts_internal.h"
 
 #include "include/scene/object.h"
@@ -42,7 +43,7 @@ static sol::object uiToLua(UIElement* ui)
 
 static void registerLuaAPI()
 {
-    lua.open_libraries(sol::lib::base, sol::lib::math);
+    lua.open_libraries(sol::lib::base, sol::lib::math, sol::lib::table);
 
     // tell lua about the data types it can use
     lua.new_usertype<glm::vec3>("Vec3",
@@ -111,10 +112,19 @@ static void registerLuaAPI()
         "tag", sol::property(&Object::getTag, &Object::setTag),
         "draw", &Object::draw,
         "transform", &Object::transform,
+        "getMesh", [](Object* obj) { return obj->getComponent<MeshComponent>(); },
         "getCamera", [](Object* obj) { return obj->getComponent<CameraComponent>(); },
         "getRig", [](Object* obj) { return obj->getComponent<RigComponent>(); },
         "getCapsuleCollider", [](Object* obj) { return obj->getComponent<CapsuleColliderComponent>(); },
-        "getAudioSource", [](Object* obj) { return obj->getComponent<AudioSourceComponent>(); }
+        "getAudioSource", [](Object* obj) { return obj->getComponent<AudioSourceComponent>(); },
+        "getScript", [](Object* obj) -> sol::object {
+            for (ScriptInstance& si : scripts)
+                if (si.obj == obj) return sol::make_object(lua, si.env);
+            return sol::lua_nil;
+        }
+    );
+    lua.new_usertype<MeshComponent>("Mesh",
+        "draw", &MeshComponent::draw
     );
     lua.new_usertype<CameraComponent>("Camera",
         "pos", &CameraComponent::pos,
@@ -192,9 +202,18 @@ static void registerLuaAPI()
         UIElement* ui = findUIElement(name, UI::uiRoots);
         return uiToLua(ui);
     });
+    find.set_function("allWithTag", [](const std::string& tag) {
+        std::vector<Object*> out;
+        forEachObj([&](Object& o) { if (o.getTag() == tag) out.push_back(&o); });
+        return sol::as_table(out);
+    });
     sol::table raycast = lua.create_named_table("raycast");
     raycast.set_function("occluded", [](const glm::vec3& origin, const glm::vec3& dir, float maxDist) {
         return Physics::rayOccluded(origin, dir, maxDist, Physics::rootNode);
+    });
+    raycast.set_function("hitCapsule", [](const glm::vec3& origin, const glm::vec3& dir, float maxDist,
+                                          CapsuleColliderComponent* cap) { // returns distance to capsule or -1 if doesnt hit
+            return Physics::rayHitCapsule(origin, dir, maxDist, cap);
     });
     lua.set_function(
         "swapScene", [](const std::string& path) { Auric::Scene::pendingScene = path; }

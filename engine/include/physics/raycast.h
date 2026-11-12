@@ -1,6 +1,7 @@
 #pragma once
 
 #include "include/physics/types.h"
+#include "include/scene/object.h"
 
 #include <glm/glm.hpp>
 
@@ -22,6 +23,9 @@ namespace Auric::Physics
 
 bool rayOccluded(const glm::vec3& origin, const glm::vec3& dir,
                         float maxDist, const BVHnode& node);
+
+float rayHitCapsule(const glm::vec3& origin, const glm::vec3& dir, float maxDist,
+                   CapsuleColliderComponent* cap);
 
 void splitBVHnode(BVHnode* node);
 

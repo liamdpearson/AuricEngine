@@ -1,6 +1,35 @@
 {
     "objects": [
         {
+            "name": "zombie1",
+            "tag": "zombie",
+            "transform": [
+                0.0, 5.0, 0.0,
+                0.0, 0.0, 0.0,
+                10.0, 10.0, 10.0
+            ],
+            "components": [
+                {
+                    "ID": 1,
+                    "meshpath": "assets/objects/zombie/zombie.fbx",
+                    "texpath": "assets/objects/zombie/zombie.jpg",
+                    "pixelated": true,
+                    "draw": true
+                },
+                {
+                    "ID": 8,
+                    "path": "assets/scripts/zombie.lua"
+                },
+                {
+                    "ID": 6,
+                    "radius": 0.3,
+                    "height": 1.8
+                }
+            ],
+            "parentbonename": "",
+            "children": []
+        },
+        {
             "name": "test",
             "tag": "",
             "transform": [
