@@ -4,8 +4,8 @@
             "name": "zombie1",
             "tag": "zombie",
             "transform": [
-                0.0, 5.0, 0.0,
-                0.0, 0.0, 0.0,
+                5.55, 1.0, -7.4,
+                -34.0, 0.0, 0.0,
                 10.0, 10.0, 10.0
             ],
             "components": [
@@ -23,7 +23,65 @@
                 {
                     "ID": 6,
                     "radius": 0.3,
-                    "height": 1.8
+                    "height": 3.04
+                }
+            ],
+            "parentbonename": "",
+            "children": []
+        },
+        {
+            "name": "zombie2",
+            "tag": "zombie",
+            "transform": [
+                -8.8, 1.0, -7.4,
+                42.0, 0.0, 0.0,
+                10.0, 10.0, 10.0
+            ],
+            "components": [
+                {
+                    "ID": 1,
+                    "meshpath": "assets/objects/zombie/zombie.fbx",
+                    "texpath": "assets/objects/zombie/zombie.jpg",
+                    "pixelated": true,
+                    "draw": true
+                },
+                {
+                    "ID": 8,
+                    "path": "assets/scripts/zombie.lua"
+                },
+                {
+                    "ID": 6,
+                    "radius": 0.3,
+                    "height": 3.04
+                }
+            ],
+            "parentbonename": "",
+            "children": []
+        },
+        {
+            "name": "zombie3",
+            "tag": "zombie",
+            "transform": [
+                5.55, 1.0, 7.2,
+                -130.5, 0.0, 0.0,
+                10.0, 10.0, 10.0
+            ],
+            "components": [
+                {
+                    "ID": 1,
+                    "meshpath": "assets/objects/zombie/zombie.fbx",
+                    "texpath": "assets/objects/zombie/zombie.jpg",
+                    "pixelated": true,
+                    "draw": true
+                },
+                {
+                    "ID": 8,
+                    "path": "assets/scripts/zombie.lua"
+                },
+                {
+                    "ID": 6,
+                    "radius": 0.3,
+                    "height": 3.04
                 }
             ],
             "parentbonename": "",
@@ -242,3 +300,4 @@
     "ambient": 0.4,
     "lightmapResScalar": 0.1
 }
+

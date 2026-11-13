@@ -19,7 +19,7 @@ local function shoot()
 
     for _, z in ipairs(zombies) do
         local d = raycast.hitCapsule(origin, dir, 100, z.capsule)
-        if d and not raycast.occluded(origin, dir, d) then
+        if d > 0.0 and not raycast.occluded(origin, dir, d) then
             z.script.hit()
         end
     end

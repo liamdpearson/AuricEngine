@@ -2,12 +2,14 @@ local mesh
 local capsule
 local rig
 local health = 3
+local player
 
 function start()
     mesh = self:getMesh()
     capsule = self:getCapsuleCollider()
     rig = self:getRig()
-    rig:setAnim(1)
+    rig:setAnim(0)
+    player = find.obj("player")
 end
 
 function hit()
@@ -31,5 +33,10 @@ function resolveMovement(deltaTime)
 end
 
 function update(deltaTime)
+    moveDir = player.transform:pos() - self.transform:pos()
+    moveDir:normalize()
+
+    capsule.velocity = capsule.velocity + moveDir * 30 * deltaTime
+
     resolveMovement(deltaTime)
 end
