@@ -138,6 +138,14 @@ bool rayOccluded(const glm::vec3& origin, const glm::vec3& dir,
     return false;
 }
 
+bool rayOccluded(const glm::vec3 &origin, const glm::vec3 &destination, const BVHnode& node)
+{
+    glm::vec3 dir = origin - destination;
+    float maxDist = glm::length(dir);
+    dir = glm::normalize(dir); 
+    return rayOccluded(origin, dir, maxDist, node);
+}
+
 // old raycast method for reference
 // bool rayOccluded(const glm::vec3& origin, const glm::vec3& dir,
 //                         float maxDist, const BVHnode& node)

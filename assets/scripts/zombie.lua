@@ -3,13 +3,18 @@ local capsule
 local rig
 local health = 3
 local player
+local playerCapsule
+local state = 0 -- 0: idle, 1: walking towards player, 2: attacking player, 3: dead
 
 function start()
     mesh = self:getMesh()
     capsule = self:getCapsuleCollider()
     rig = self:getRig()
     rig:setAnim(0)
+
     player = find.obj("player")
+    playerCapsule = player:getCapsuleCollider()
+
 end
 
 function hit()
@@ -33,10 +38,22 @@ function resolveMovement(deltaTime)
 end
 
 function update(deltaTime)
-    moveDir = player.transform:pos() - self.transform:pos()
-    moveDir:normalize()
 
-    capsule.velocity = capsule.velocity + moveDir * 30 * deltaTime
+    head = self.transform:pos()
+    head.y = head.y + capsule.height - capsule.radius
+
+    playerHead = player.transform:pos()
+    playerHead.y = playerHead.y + playerCapsule.height - playerCapsule.radius
+
+    moveDir = Vec3.new(0)
+
+    if not raycast.occluded(head, playerHead) then
+        moveDir = player.transform:pos() - self.transform:pos()
+        moveDir.y = 0.0
+        moveDir:normalize()
+    end
+    
+    capsule.velocity = capsule.velocity + moveDir * 10 * deltaTime
 
     resolveMovement(deltaTime)
 end

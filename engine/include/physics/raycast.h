@@ -24,6 +24,8 @@ namespace Auric::Physics
 bool rayOccluded(const glm::vec3& origin, const glm::vec3& dir,
                         float maxDist, const BVHnode& node);
 
+bool rayOccluded(const glm::vec3 &origin, const glm::vec3 &destination, const BVHnode& node);
+
 float rayHitCapsule(const glm::vec3& origin, const glm::vec3& dir, float maxDist,
                    CapsuleColliderComponent* cap);
 

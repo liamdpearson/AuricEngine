@@ -208,9 +208,14 @@ static void registerLuaAPI()
         return sol::as_table(out);
     });
     sol::table raycast = lua.create_named_table("raycast");
-    raycast.set_function("occluded", [](const glm::vec3& origin, const glm::vec3& dir, float maxDist) {
-        return Physics::rayOccluded(origin, dir, maxDist, Physics::rootNode);
-    });
+    raycast.set_function("occluded", sol::overload(
+        [](const glm::vec3& origin, const glm::vec3& dir, float maxDist) {
+            return Physics::rayOccluded(origin, dir, maxDist, Physics::rootNode);
+        },
+        [](const glm::vec3& origin, const glm::vec3& destination) {
+            return Physics::rayOccluded(origin, destination, Physics::rootNode);
+        }
+    ));
     raycast.set_function("hitCapsule", [](const glm::vec3& origin, const glm::vec3& dir, float maxDist,
                                           CapsuleColliderComponent* cap) { // returns distance to capsule or -1 if doesnt hit
             return Physics::rayHitCapsule(origin, dir, maxDist, cap);
