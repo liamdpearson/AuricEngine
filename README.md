@@ -92,7 +92,7 @@ engine/
 - Add editor with ImGui
 
 
-## How to run test scene yourself
+## How to run the test scene yourself
 ### Windows
 Prerequisites: MinGW/GCC, git, and CMake 3.16 or newer.
 1. git clone https://github.com/liamdpearson/AuricEngine
