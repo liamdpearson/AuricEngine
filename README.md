@@ -18,7 +18,8 @@ This project is still in its early stages of development. I doubt it will ever b
 - Object hierarchy using 4x4 world matrices
 - Component based system with components: Mesh, Camera, Audiosource, Script, etc
 - UI hierarchy with types: UIImage and UIText as children of UIElement
-- Basic collisions for capsules
+- Basic collisions and raycasting for capsules
+- BVH for raycasting against static meshes
 - Baked light maps for static meshes with point and line lights
 - Light grid for dynamic meshes containing light value and dominant light direction
 - Mesh support from .obj and .fbx files
