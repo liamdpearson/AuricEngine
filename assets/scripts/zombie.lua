@@ -51,9 +51,24 @@ function update(deltaTime)
         moveDir = player.transform:pos() - self.transform:pos()
         moveDir.y = 0.0
         moveDir:normalize()
+        
+        angle = math.deg(math.atan(moveDir.x / moveDir.z))
+        if (moveDir.z < 0.0) then
+            angle = angle + 180.0
+        end
+
+        self.transform.yaw = angle
+
+        state = 1
+    else
+        state = 0
     end
     
     capsule.velocity = capsule.velocity + moveDir * 10 * deltaTime
 
     resolveMovement(deltaTime)
+
+    if rig.currentAnim ~= state then
+        rig:setAnim(state, 0.5)
+    end
 end

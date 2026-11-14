@@ -140,7 +140,7 @@ bool rayOccluded(const glm::vec3& origin, const glm::vec3& dir,
 
 bool rayOccluded(const glm::vec3 &origin, const glm::vec3 &destination, const BVHnode& node)
 {
-    glm::vec3 dir = origin - destination;
+    glm::vec3 dir = destination - origin;
     float maxDist = glm::length(dir);
     dir = glm::normalize(dir); 
     return rayOccluded(origin, dir, maxDist, node);
