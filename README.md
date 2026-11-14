@@ -101,3 +101,11 @@ Make sure gcc, g++, and mingw32-make are on your path.
 4. cmake --build build
 5. ./release
 
+### Linux
+Prerequisites: GCC, git, and CMake 3.16 or newer
+Make sure gcc, g++, and mingw32-make are on your path.
+1. git clone https://github.com/liamdpearson/AuricEngine
+2. cd AuricEngine
+3. cmake -S . -B build
+4. cmake --build build
+5. ./release
