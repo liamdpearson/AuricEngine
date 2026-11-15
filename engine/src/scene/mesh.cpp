@@ -9,6 +9,7 @@
 
 #include "include/core/animation.h"
 #include "include/core/constants.h"
+#include "include/scene/object.h"
 
 
 using namespace Auric;
@@ -422,3 +423,21 @@ void loadFbxRig(const char* path,
     }
     ufbx_free_scene(scene);
 }
+
+// glm::vec3 centerOfMesh(MeshComponent* mesh)
+// {
+//     const std::vector<float>& verts = mesh->vertices;
+//
+//     glm::vec3 max{0.0f, 0.0f, 0.0f};
+//     glm::vec3 min{0.0f, 0.0f, 0.0f};
+//
+//     for (int i = 0; i < (int)verts.size(); i += Constants::VERTEX_FLOATS) {
+//         if (verts[i]   > max.x) max.x = verts[i];
+//         if (verts[i+1] > max.y) max.y = verts[i+1];
+//         if (verts[i+2] > max.z) max.z = verts[i+2];
+//         if (verts[i]   < min.x) min.x = verts[i];
+//         if (verts[i+1] < min.y) min.y = verts[i+1];
+//         if (verts[i+2] < min.z) min.z = verts[i+2];
+//     }
+//     return (max + min) / 2.0f;
+// }

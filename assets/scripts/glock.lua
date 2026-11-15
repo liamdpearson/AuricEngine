@@ -1,4 +1,5 @@
 local ammo
+local ammoIndicator
 local rig
 local zombies = {}
 
@@ -6,6 +7,7 @@ function start()
     rig = self:getRig()
     rig:setAnim(0)
     ammo = 17
+    ammoIndicator = find.ui("ammo")
 
     cam = find.obj("camera"):getCamera()
     for _, z in ipairs(find.allWithTag("zombie")) do
@@ -47,4 +49,6 @@ function update(deltaTime)
         rig:setAnim(5, 0.05, 0)
         ammo = 17
     end
+
+    ammoIndicator.text = tostring(ammo)
 end

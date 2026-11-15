@@ -11,7 +11,6 @@
 #include <iostream>
 
 #include "include/core/constants.h"
-#include "include/core/scripts.h"
 #include "include/render/graphics.h"
 #include "include/scene/object.h"
 #include "include/scene/mesh.h"

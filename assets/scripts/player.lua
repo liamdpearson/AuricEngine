@@ -1,6 +1,10 @@
 local camnhands
 local rig
 local capsule
+
+local health
+local healthIndicator
+
 local crosshair
 local walking
 local ads
@@ -11,11 +15,15 @@ function start()
     capsule = self:getCapsuleCollider()
     rig:setAnim(0)
     crosshair = find.ui("crosshair")
+
+    health = 5
+    healthIndicator = find.ui("health")
+
     walking = false
     ads = false
 end
 
-function update(deltaTime)
+function resolveMovement(deltaTime)
     self.transform.yaw = self.transform.yaw - input.mouseDX() * 0.05
     camnhands.transform.pitch = camnhands.transform.pitch + input.mouseDY() * 0.05
     if camnhands.transform.pitch > 90.0 then
@@ -76,27 +84,20 @@ function update(deltaTime)
         walking = false
     end
 
-    capsule.velocity.y = capsule.velocity.y - 9.81 * deltaTime
-    if (capsule.velocity.y < -50.0) then
-        capsule.velocity.y = -50.0
-    end
-
     damping = 0.00005 ^ deltaTime
     capsule.velocity.x = capsule.velocity.x * damping
     capsule.velocity.z = capsule.velocity.z * damping
     capsule.velocity = capsule.velocity + moveDir * acceleration
 
+    capsule.velocity.y = capsule.velocity.y - 9.81 * deltaTime
+    if (capsule.velocity.y < -50.0) then
+        capsule.velocity.y = -50.0
+    end
+
     capsule:resolveCollisions(deltaTime)
+end
 
-    if input.mousePressed(mouse.RIGHT) then
-        ads = true
-        crosshair.draw = false
-    end
-    if input.mouseReleased(mouse.RIGHT) then
-        ads = false
-        crosshair.draw = true
-    end
-
+function resolveAnim()
     w = 0
     if walking then
         w = 1
@@ -109,4 +110,28 @@ function update(deltaTime)
     if rig.currentAnim ~= shouldBe then
         rig:setAnim(shouldBe, 0.1)
     end
+end
+
+function resolveADS()
+    if input.mousePressed(mouse.RIGHT) then
+        ads = true
+        crosshair.draw = false
+    end
+    if input.mouseReleased(mouse.RIGHT) then
+        ads = false
+        crosshair.draw = true
+    end
+end
+
+function hit(damage)
+    health = health - damage or 1
+end
+
+function update(deltaTime)
+
+    resolveMovement(deltaTime)
+    resolveADS()
+    resolveAnim()
+
+    healthIndicator.text = tostring(health)
 end
