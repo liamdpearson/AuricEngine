@@ -87,12 +87,14 @@ engine/
 
 
 ## TO DO:
+- Add an alpha toggle for textures
+- Finish rectangle lights
 - Add a decal system
 - Add a particle system
 - Add editor with ImGui
 
 
-## How to run the test scene yourself
+## How to build yourself and run the test scene
 ### Windows
 Prerequisites: MinGW/GCC, git, and CMake 3.16 or newer.
 1. git clone https://github.com/liamdpearson/AuricEngine

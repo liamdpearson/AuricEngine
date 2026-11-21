@@ -28,8 +28,8 @@ std::chrono::high_resolution_clock::time_point currentFrameTime = std::chrono::h
 
 unsigned int shaderProgram;
 
-int modelLoc, projectionLoc, viewLoc, normalMatLoc, boneMatricesLoc;
-int texLoc, lightMapLoc, lightModeLoc, lightDirLoc, objectLightLoc;
+int modelLoc, projectionLoc, viewLoc, normalMatLoc, boneMatricesLoc, texScaleLoc;
+int texLoc, lightMapLoc, lightModeLoc, lightDirLoc, objectLightLoc, glowColorLoc, glowIntensityLoc;
 
 const char* vertexShaderSource = R"glsl(
 #version 330 core
@@ -52,6 +52,7 @@ uniform mat4 projection;
 uniform mat4 view;
 uniform mat3 normalMat;
 uniform mat4 boneMatrices[MAX_BONES];
+uniform float texScale;
 
 void main()
 {
@@ -77,7 +78,7 @@ void main()
     }
 
     gl_Position = projection * view * model * pos;
-    TexCoord = aTexCoord;
+    TexCoord = aTexCoord * texScale;
     LightMapCoord = aLightMapCoord;
     Normal = normalMat * mat3(skin) * aNormal;
     FragPos = vec3(model * pos);
@@ -94,10 +95,12 @@ in vec2 LightMapCoord;
 in vec3 FragPos;
 
 uniform sampler2D tex;
-uniform sampler2D lightMap; // only used when lightMode = 1
 uniform int lightMode;
 uniform vec3 lightDir;    // only used when lightMode = 0
 uniform vec3 objectLight; // only used when lightMode = 0
+uniform sampler2D lightMap; // only used when lightMode = 1
+uniform vec3 glowColor; // only used when lightMode = 2
+uniform float glowIntensity; // only used when lightMode = 2
 
 void main()
 {
@@ -117,9 +120,13 @@ void main()
         vec4 l = texture(lightMap, LightMapCoord);
         lit = l.rgb;
     }
+    else if (lightMode == 2)
+    {
+        lit = glowColor * glowIntensity;
+    }
 
     vec4 t = texture(tex, TexCoord);
-    FragColor = vec4(t.rgb * lit, t.a * 0.5);
+    FragColor = vec4(t.rgb * lit, t.a);
 }
 )glsl";
 
@@ -181,6 +188,7 @@ void buildShaderProgram()
     viewLoc         = glGetUniformLocation(shaderProgram, "view");
     normalMatLoc    = glGetUniformLocation(shaderProgram, "normalMat");
     boneMatricesLoc = glGetUniformLocation(shaderProgram, "boneMatrices");
+    texScaleLoc = glGetUniformLocation(shaderProgram, "texScale");
 
     // frag shader uniforms
     texLoc = glGetUniformLocation(shaderProgram, "tex");
@@ -188,6 +196,8 @@ void buildShaderProgram()
     lightModeLoc = glGetUniformLocation(shaderProgram, "lightMode");
     lightDirLoc = glGetUniformLocation(shaderProgram, "lightDir");
     objectLightLoc = glGetUniformLocation(shaderProgram, "objectLight");
+    glowColorLoc = glGetUniformLocation(shaderProgram, "glowColor");
+    glowIntensityLoc = glGetUniformLocation(shaderProgram, "glowIntensity");
 }
 
 std::pair<int, int> textureDimensions(const char* path)
@@ -217,10 +227,10 @@ unsigned int loadTexture(const char* src, bool pixelated, bool clampEdge)
 
     int width, height, nrChannels;
     stbi_set_flip_vertically_on_load(true); // pngs are top down gl expects bottom up
-    unsigned char* data = stbi_load(src, &width, &height, &nrChannels, 0);
+    unsigned char* data = stbi_load(src, &width, &height, &nrChannels, 4);
     if (data)
     {   
-        GLenum format = nrChannels == 4 ? GL_RGBA : nrChannels == 3 ? GL_RGB : GL_RED;
+        GLenum format = GL_RGBA;
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
         glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);

@@ -1,6 +1,8 @@
 #include "include/lighting/lightmap.h"
 
 #include <xatlas/xatlas.h>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/rotate_vector.hpp>
 
 #include <vector>
 #include <iostream>
@@ -252,6 +254,19 @@ static void bakeLightmap(LightMapComponent* lm, MeshComponent* mesh)
 
                             lit += light->color * lambert * atten;
                         }
+                    }
+                    else if (const RectLight* light = dynamic_cast<const RectLight*>(l)) {
+                        const glm::vec3 p0p1 = light->p1 - light->p0;
+                        glm::vec3 parallel{1.0f, 0.0f, 0.0f};
+                        
+                        parallel = glm::normalize(parallel - glm::dot(parallel, p0p1) / glm::dot(p0p1, p0p1) * p0p1);
+                        glm::vec3 dir = glm::rotate(parallel, light->angle, glm::normalize(p0p1)) * light->distance;
+
+                        float d1 = glm::length(p0p1);
+                        float d2 = light->distance;
+
+                        const glm::vec3 p0 = light->p0, p1 = light->p1;
+                        const glm::vec3 p2 = p0 + dir, p3 = p1 + dir;
                     }
                 }
                 // hue preservation clamp

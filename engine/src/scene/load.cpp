@@ -34,11 +34,12 @@ static void buildComponent(const json& node, Object* owner)
         case Constants::MESHID: {
             const std::string meshpath = node.value("meshpath", "");
             const std::string texpath = node.value("texpath", "");
-            const bool pixelated = node.value("pixelated", false); 
-            const bool draw = node.value("draw", true); 
+            float texscale = node.value("texscale", 1.0f);
+            bool pixelated = node.value("pixelated", false); 
+            bool draw = node.value("draw", true); 
 
             std::pair<std::unique_ptr<MeshComponent>, std::unique_ptr<RigComponent>> pair;
-            pair = Assets::makeMesh(meshpath.c_str(), texpath.c_str(), pixelated, draw);
+            pair = Assets::makeMesh(meshpath.c_str(), texpath.c_str(), pixelated, draw, texscale);
             
             owner->addComponent(std::move(pair.first));
             
@@ -49,7 +50,7 @@ static void buildComponent(const json& node, Object* owner)
         }
 
         case Constants::CAMERAID: {
-            const float FOV = node.value("FOV", 90.0f);
+            float FOV = node.value("FOV", 90.0f);
 
             std::unique_ptr<CameraComponent> cam = Assets::makeCamera(FOV);
             if (node.value("isCurrent", false)) currentCam = cam.get();
@@ -82,8 +83,8 @@ static void buildComponent(const json& node, Object* owner)
         }
 
         case Constants::CAPSULECOLLIDERID: {
-            const float radius = node.value("radius", 0.3f);
-            const float height = node.value("height", 1.8f);
+            float radius = node.value("radius", 0.3f);
+            float height = node.value("height", 1.8f);
 
             std::unique_ptr<CapsuleColliderComponent> cap;
             cap = Assets::makeCapsuleCollider(radius, height);
@@ -94,10 +95,10 @@ static void buildComponent(const json& node, Object* owner)
 
         case Constants::AUDIOSOURCEID: {
             const std::string path = node.value("path", "");
-            const float volume = node.value("volume", 0.0f);
-            const float maxDistance = node.value("maxDistance", 0.0f);
-            const float falloff = node.value("falloff", 0.0f);
-            const bool loop = node.value("loop", false); 
+            float volume = node.value("volume", 0.0f);
+            float maxDistance = node.value("maxDistance", 0.0f);
+            float falloff = node.value("falloff", 0.0f);
+            bool loop = node.value("loop", false); 
 
             std::unique_ptr<AudioSourceComponent> audiosource;
             audiosource = Assets::makeAudioSource(path.c_str(), volume, maxDistance, falloff, loop);
@@ -113,6 +114,19 @@ static void buildComponent(const json& node, Object* owner)
             script = Assets::makeScript(path);
             owner->addComponent(std::move(script));
             Scripting::attachScript(owner, path);
+
+            break;
+        }
+
+        case Constants::GLOWID: {
+            float intensity = node.value("intensity", 1.0f);
+            const json& c = node.at("color");
+            glm::vec3 color = glm::vec3{c.at(0).get<float>(), c.at(1).get<float>(), c.at(2).get<float>()};
+
+
+            std::unique_ptr<GlowComponent> glow;
+            glow = Assets::makeGlow(intensity, color);
+            owner->addComponent(std::move(glow));
 
             break;
         }
@@ -355,6 +369,36 @@ int swapScene(const char* path)
     if (!loadScene(path)) return 0;
     Scripting::loadScripts();
 
+    // initial compose loop
+    forEachObj([](Object& obj) {
+        if (!obj.parent) {
+            obj.setWorld(obj.transform.matrix());
+        } else {
+            glm::mat4 parentWorld = obj.parent->getWorld();
+
+            int boneIndex = obj.getBoneIndex();
+            RigComponent* parentRig = boneIndex > -1 ? obj.parent->getComponent<RigComponent>() : nullptr;
+            Rig* rig = parentRig ? &parentRig->rig : nullptr;
+
+            if (rig && boneIndex < (int)rig->boneWorlds.size()) {
+
+                obj.setWorld(parentWorld * rig->boneWorlds[boneIndex] * obj.transform.matrix());
+
+            } else {
+                obj.setWorld(parentWorld * obj.transform.matrix());
+            }
+        }
+
+        // update cameras
+        CameraComponent* cam = obj.getComponent<CameraComponent>();
+        if (cam) {
+            glm::mat4 w = obj.getWorld();
+            cam->pos = glm::vec3(w[3]);
+            cam->front = glm::normalize(-glm::vec3(w[2]));
+            cam->up    = glm::normalize(glm::vec3(w[1]));
+        }
+    });
+
     // this clears occluders and light grid
     Lighting::bakeSceneLighting();
 
@@ -390,7 +434,6 @@ int loadConfig(const char* path)
         file >> scene;
 
         bool vsync = scene.value("vsync", false);
-        std::cout << '\n' << vsync << "\n\n";
         if (vsync) glfwSwapInterval(1);
         else glfwSwapInterval(0);
 

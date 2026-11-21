@@ -220,8 +220,8 @@ void collectSceneColliders()
     for (TriAABB& t : colliders)
         colliderRefs.push_back(&(t.tri));
 
-    glm::vec3 min{-INFINITY, -INFINITY, -INFINITY};
-    glm::vec3 max{INFINITY, INFINITY, INFINITY};
+    glm::vec3 min{INFINITY, INFINITY, INFINITY};
+    glm::vec3 max{-INFINITY, -INFINITY, -INFINITY};
 
     for (const TriAABB& tbb : colliders) {
 

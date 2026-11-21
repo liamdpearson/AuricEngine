@@ -122,6 +122,7 @@ struct MeshComponent : Component
     std::vector<float> vertices;
     std::vector<unsigned int> indices;
     unsigned int texture = 0;
+    float texScale = 1.0f;
 
     GLsizei indexCount = 0;
     unsigned int VAO = 0, VBO = 0, EBO = 0;
@@ -194,6 +195,14 @@ struct ScriptComponent : Component
     static inline const unsigned int CID = Auric::Constants::SCRIPTID;
 
     std::string path;
+};
+
+struct GlowComponent : Component
+{
+    static inline const unsigned int CID = Auric::Constants::GLOWID;
+
+    float intensity = 1.0f;
+    glm::vec3 color{1.0f, 1.0f, 1.0f};
 };
 
 // define scene variables

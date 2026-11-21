@@ -20,9 +20,8 @@ using namespace Auric;
 
 namespace Auric::Assets {
 
-std::pair<std::unique_ptr<MeshComponent>, std::unique_ptr<RigComponent>> makeMesh(const char* objSrc, 
-                                                                                  const char* texSrc,
-                                                                                  bool pixelated, bool draw)
+std::pair<std::unique_ptr<MeshComponent>, std::unique_ptr<RigComponent>> makeMesh(const char* objSrc, const char* texSrc,
+                                                                                  bool pixelated, bool draw, float texScale)
 {
     auto mesh = std::make_unique<MeshComponent>();
 
@@ -50,6 +49,7 @@ std::pair<std::unique_ptr<MeshComponent>, std::unique_ptr<RigComponent>> makeMes
     mesh->vertices = verts;
     mesh->indices  = idx;
     mesh->texture  = Render::loadTexture(texSrc, pixelated);
+    mesh->texScale = texScale;
     mesh->indexCount = (GLsizei)idx.size();
     mesh->draw = draw;
 
@@ -161,6 +161,17 @@ std::unique_ptr<ScriptComponent> makeScript(const std::string path)
     script->path = path;
     
     return script;
+}
+
+std::unique_ptr<GlowComponent> makeGlow(float intensity, const glm::vec3& color)
+{
+    auto glow = std::make_unique<GlowComponent>();
+
+    glow->cid = Auric::Constants::GLOWID;
+    glow->intensity = intensity;
+    glow->color = color;
+
+    return glow;
 }
 
 }

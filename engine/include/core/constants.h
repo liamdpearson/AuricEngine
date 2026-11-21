@@ -21,5 +21,6 @@ inline constexpr unsigned int COLLIDERID = 5;
 inline constexpr unsigned int CAPSULECOLLIDERID = 6;
 inline constexpr unsigned int AUDIOSOURCEID = 7;
 inline constexpr unsigned int SCRIPTID = 8;
+inline constexpr unsigned int GLOWID = 9;
 
 }

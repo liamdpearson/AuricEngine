@@ -7,9 +7,8 @@
 
 namespace Auric::Assets {
 
-std::pair<std::unique_ptr<MeshComponent>, std::unique_ptr<RigComponent>> makeMesh(const char* objSrc, 
-                                                                                  const char* texSrc,
-                                                                                  bool pixelated, bool draw);
+std::pair<std::unique_ptr<MeshComponent>, std::unique_ptr<RigComponent>> makeMesh(const char* objSrc, const char* texSrc,
+                                                                                  bool pixelated, bool draw, float texscale = 1.0f);
 
 std::unique_ptr<CameraComponent> makeCamera(float FOV);
 
@@ -25,5 +24,7 @@ std::unique_ptr<AudioSourceComponent> makeAudioSource(const char* path, float vo
                                                       float maxDistance, float falloff, bool loop);
 
 std::unique_ptr<ScriptComponent> makeScript(const std::string path);
+
+std::unique_ptr<GlowComponent> makeGlow(float intensity, const glm::vec3& color);
 
 }

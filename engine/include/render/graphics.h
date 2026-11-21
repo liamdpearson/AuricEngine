@@ -27,8 +27,10 @@ extern std::chrono::high_resolution_clock::time_point lastFrameTime, currentFram
 
 extern unsigned int shaderProgram;
 
-extern int modelLoc, projectionLoc, viewLoc, normalMatLoc, boneMatricesLoc;
-extern int texLoc, lightMapLoc, lightModeLoc, lightDirLoc, objectLightLoc;
+// vertex shader locations
+extern int modelLoc, projectionLoc, viewLoc, normalMatLoc, boneMatricesLoc, texScaleLoc;
+// fragment shader locations
+extern int texLoc, lightMapLoc, lightModeLoc, lightDirLoc, objectLightLoc, glowColorLoc, glowIntensityLoc;
 
 extern const char* vertexShaderSource;
 extern const char* fragmentShaderSource;

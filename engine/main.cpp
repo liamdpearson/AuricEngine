@@ -221,18 +221,26 @@ int main()
             glm::mat3 normalMat = glm::mat3(glm::transpose(glm::inverse(w)));
             glUniformMatrix4fv(Render::modelLoc, 1, GL_FALSE, glm::value_ptr(w));
             glUniformMatrix3fv(Render::normalMatLoc, 1, GL_FALSE, glm::value_ptr(normalMat));
+            glUniform1f(Render::texScaleLoc, mesh->texScale);
 
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, mesh->texture);
             glUniform1i(Render::texLoc, 0);
 
             LightMapComponent* lm = obj.getComponent<LightMapComponent>();
+            GlowComponent* glow = obj.getComponent<GlowComponent>();
             if (lm) {
                 glUniform1i(Render::lightModeLoc, 1);
 
                 glActiveTexture(GL_TEXTURE1);
                 glBindTexture(GL_TEXTURE_2D, lm->lightMap);
                 glUniform1i(Render::lightMapLoc, 1);
+            } else if (glow) {
+                glUniform1i(Render::lightModeLoc, 2);
+
+                glActiveTexture(GL_TEXTURE1);
+                glUniform1f(Render::glowIntensityLoc, glow->intensity);
+                glUniform3fv(Render::glowColorLoc, 1, glm::value_ptr(glow->color));
             } else {
                 glUniform1i(Render::lightModeLoc, 0);
 

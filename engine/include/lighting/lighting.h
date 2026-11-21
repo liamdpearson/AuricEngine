@@ -35,6 +35,13 @@ struct LineLight : Light
     int segments;
 };
 
+struct RectLight: Light
+{
+    glm::vec3 p0, p1;
+    float angle, distance;
+    float segmentMultiplier;
+};
+
 struct LightGrid
 {
     std::vector<std::pair<glm::vec3, glm::vec3>> values;
