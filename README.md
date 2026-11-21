@@ -2,6 +2,9 @@
 
 This project is still in its early stages of development. I doubt it will ever be finished. It is mainly just for fun because I like the look of old school graphics.
 
+<p align="left">
+  <img src="github-images/zombie.png" width="1000">
+</p>
 
 ## Third Party Libraries
 - OpenGL 3.3 with GLFW and GLAD
