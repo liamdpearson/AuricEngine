@@ -86,14 +86,6 @@ engine/
 ```
 
 
-## TO DO:
-- Add an alpha toggle for textures
-- Finish rectangle lights
-- Add a decal system
-- Add a particle system
-- Add editor with ImGui
-
-
 ## How to build yourself and run the test scene
 ### Windows
 Prerequisites: MinGW/GCC, git, and CMake 3.16 or newer.
@@ -110,3 +102,14 @@ Prerequisites: GCC, git, and CMake 3.16 or newer.
 3. cmake -S . -B build
 4. cmake --build build
 5. ./release
+
+
+## Short Term Goals:
+- Add an alpha toggle for textures
+- Finish rectangle lights
+- Finish test scene
+
+## Long Term Goals:
+- Add a decal system
+- Add a particle system
+- Add editor with ImGui
