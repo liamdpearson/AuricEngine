@@ -660,6 +660,7 @@
         }
     ],
     "globalscripts": [
+        "assets/scripts/fps.lua"
     ],
     "ambient": 0.1,
     "lightmapResScalar": 0.01
