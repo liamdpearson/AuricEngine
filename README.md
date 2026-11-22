@@ -112,7 +112,6 @@ Prerequisites: GCC, git, and CMake 3.16 or newer.
 
 
 ## Short Term Goals:
-- Finish rectangle lights
 - Finish test scene
 
 ## Long Term Goals:
