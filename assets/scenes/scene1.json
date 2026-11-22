@@ -82,11 +82,6 @@
                     "ID": 6,
                     "radius": 0.28,
                     "height": 2.12
-                },
-                {
-                    "ID": 9,
-                    "intensity": 2.0,
-                    "color": [0.8029638, 0.53921187, 0.9554455]
                 }
             ],
             "parentbonename": "",
@@ -203,10 +198,10 @@
             ]
         },
         {
-            "name": "light1",
+            "name": "light",
             "tag": "",
             "transform": [
-                0.0, 11.11, 0.0,
+                -0.15, 11.11, 1.55,
                 0.0, 0.0, 0.0,
                 1.0, 1.0, 1.0
             ],
@@ -249,29 +244,273 @@
                     "children": []
                 }
             ]
+        },
+        {
+            "name": "light (2)",
+            "tag": "",
+            "transform": [
+                2.0, 6.49, -0.45,
+                0.0, 0.0, 0.0,
+                1.0, 1.0, 1.0
+            ],
+            "components": [
+                {
+                    "ID": 1,
+                    "meshpath": "assets/objects/lights/rectlight.obj",
+                    "texpath": "assets/objects/lights/rectlight.png",
+                    "texscale": 1.0,
+                    "pixelated": true,
+                    "draw": true
+                }
+            ],
+            "parentbonename": "",
+            "children": [
+                {
+                    "name": "Object",
+                    "tag": "",
+                    "transform": [
+                        0.0, 0.0, 0.0,
+                        0.0, 0.0, 0.0,
+                        1.0, 1.0, 1.0
+                    ],
+                    "components": [
+                        {
+                            "ID": 1,
+                            "meshpath": "assets/objects/lights/rectlightmid.obj",
+                            "texpath": "assets/objects/lights/rectlightmid.png",
+                            "texscale": 1.0,
+                            "pixelated": true,
+                            "draw": true
+                        },
+                        {
+                            "ID": 9,
+                            "intensity": 2.0,
+                            "color": [0.5, 0.5, 1.0]
+                        }
+                    ],
+                    "parentbonename": "",
+                    "children": []
+                }
+            ]
+        },
+        {
+            "name": "light (4)",
+            "tag": "",
+            "transform": [
+                -10.6, 5.07, -5.7,
+                0.0, 0.0, 0.0,
+                1.0, 1.0, 1.0
+            ],
+            "components": [
+                {
+                    "ID": 1,
+                    "meshpath": "assets/objects/lights/rectlight.obj",
+                    "texpath": "assets/objects/lights/rectlight.png",
+                    "texscale": 1.0,
+                    "pixelated": true,
+                    "draw": true
+                }
+            ],
+            "parentbonename": "",
+            "children": [
+                {
+                    "name": "Object",
+                    "tag": "",
+                    "transform": [
+                        0.0, 0.0, 0.0,
+                        0.0, 0.0, 0.0,
+                        1.0, 1.0, 1.0
+                    ],
+                    "components": [
+                        {
+                            "ID": 1,
+                            "meshpath": "assets/objects/lights/rectlightmid.obj",
+                            "texpath": "assets/objects/lights/rectlightmid.png",
+                            "texscale": 1.0,
+                            "pixelated": true,
+                            "draw": true
+                        },
+                        {
+                            "ID": 9,
+                            "intensity": 2.0,
+                            "color": [0.5, 0.5, 1.0]
+                        }
+                    ],
+                    "parentbonename": "",
+                    "children": []
+                }
+            ]
+        },
+        {
+            "name": "light (3)",
+            "tag": "",
+            "transform": [
+                0.0, 6.49, -10.95,
+                0.0, 0.0, 0.0,
+                1.0, 1.0, 1.0
+            ],
+            "components": [
+                {
+                    "ID": 1,
+                    "meshpath": "assets/objects/lights/rectlight.obj",
+                    "texpath": "assets/objects/lights/rectlight.png",
+                    "texscale": 1.0,
+                    "pixelated": true,
+                    "draw": true
+                }
+            ],
+            "parentbonename": "",
+            "children": [
+                {
+                    "name": "Object",
+                    "tag": "",
+                    "transform": [
+                        0.0, 0.0, 0.0,
+                        0.0, 0.0, 0.0,
+                        1.0, 1.0, 1.0
+                    ],
+                    "components": [
+                        {
+                            "ID": 1,
+                            "meshpath": "assets/objects/lights/rectlightmid.obj",
+                            "texpath": "assets/objects/lights/rectlightmid.png",
+                            "texscale": 1.0,
+                            "pixelated": true,
+                            "draw": true
+                        },
+                        {
+                            "ID": 9,
+                            "intensity": 2.0,
+                            "color": [0.5, 0.5, 1.0]
+                        }
+                    ],
+                    "parentbonename": "",
+                    "children": []
+                }
+            ]
+        },
+        {
+            "name": "light (1)",
+            "tag": "",
+            "transform": [
+                -0.15, 11.11, -10.2,
+                0.0, 0.0, 0.0,
+                1.0, 1.0, 1.0
+            ],
+            "components": [
+                {
+                    "ID": 1,
+                    "meshpath": "assets/objects/lights/rectlight.obj",
+                    "texpath": "assets/objects/lights/rectlight.png",
+                    "texscale": 1.0,
+                    "pixelated": true,
+                    "draw": true
+                }
+            ],
+            "parentbonename": "",
+            "children": [
+                {
+                    "name": "Object",
+                    "tag": "",
+                    "transform": [
+                        0.0, 0.0, 0.0,
+                        0.0, 0.0, 0.0,
+                        1.0, 1.0, 1.0
+                    ],
+                    "components": [
+                        {
+                            "ID": 1,
+                            "meshpath": "assets/objects/lights/rectlightmid.obj",
+                            "texpath": "assets/objects/lights/rectlightmid.png",
+                            "texscale": 1.0,
+                            "pixelated": true,
+                            "draw": true
+                        },
+                        {
+                            "ID": 9,
+                            "intensity": 2.0,
+                            "color": [0.5, 0.5, 1.0]
+                        }
+                    ],
+                    "parentbonename": "",
+                    "children": []
+                }
+            ]
+        },
+        {
+            "name": "linelight",
+            "tag": "",
+            "transform": [
+                -9.5, 5.35, 12.975,
+                270.0, 24.25, 0.0,
+                0.04, 0.04, 0.04
+            ],
+            "components": [
+                {
+                    "ID": 1,
+                    "meshpath": "assets/objects/lights/linelight.obj",
+                    "texpath": "assets/objects/lights/rectlightmid.png",
+                    "texscale": 1.0,
+                    "pixelated": true,
+                    "draw": true
+                },
+                {
+                    "ID": 9,
+                    "intensity": 2.0,
+                    "color": [0.5, 0.5, 1.0]
+                }
+            ],
+            "parentbonename": "",
+            "children": []
+        },
+        {
+            "name": "linelight (1)",
+            "tag": "",
+            "transform": [
+                -9.5, 5.35, 8.375,
+                270.0, 24.25, 0.0,
+                0.04, 0.04, 0.04
+            ],
+            "components": [
+                {
+                    "ID": 1,
+                    "meshpath": "assets/objects/lights/linelight.obj",
+                    "texpath": "assets/objects/lights/rectlightmid.png",
+                    "texscale": 1.0,
+                    "pixelated": true,
+                    "draw": true
+                },
+                {
+                    "ID": 9,
+                    "intensity": 2.0,
+                    "color": [0.5, 0.5, 1.0]
+                }
+            ],
+            "parentbonename": "",
+            "children": []
         }
     ],
     "lights": [
         {
-            "name": "light2",
-            "type": "rect",
-            "tag": "",
-            "p0": [0.95, 0.35, 0.0],
-            "p1": [-0.85, 1.55, 0.0],
-            "distance": 3.49,
-            "angle": 1.6144296,
-            "longSideSegs": 10,
-            "color": [0.0, 1.0, 1.0],
-            "intensity": 80.0,
-            "radius": 1.55,
-            "falloff": 0.791
-        },
-        {
             "name": "Rect Light",
             "type": "rect",
             "tag": "",
-            "p0": [-0.56, 11.0, -0.56],
-            "p1": [0.56, 11.0, -0.56],
+            "p0": [-0.71, 11.0, 0.99],
+            "p1": [0.41, 11.0, 0.99],
+            "distance": 2.22,
+            "angle": 1.5707964,
+            "longSideSegs": 8,
+            "color": [0.8, 0.8, 1.0],
+            "intensity": 8.05,
+            "radius": 50.0,
+            "falloff": 1.46
+        },
+        {
+            "name": "Rect Light (2)",
+            "type": "rect",
+            "tag": "",
+            "p0": [2.56, 6.38, 1.21],
+            "p1": [1.44, 6.38, 1.21],
             "distance": 2.22,
             "angle": 1.5707964,
             "longSideSegs": 8,
@@ -279,6 +518,72 @@
             "intensity": 8.05,
             "radius": 96.5,
             "falloff": 1.46
+        },
+        {
+            "name": "Rect Light (4)",
+            "type": "rect",
+            "tag": "",
+            "p0": [-11.16, 4.92, -6.26],
+            "p1": [-10.04, 4.92, -6.26],
+            "distance": 2.22,
+            "angle": 1.5707964,
+            "longSideSegs": 8,
+            "color": [0.8, 0.8, 1.0],
+            "intensity": 8.05,
+            "radius": 96.5,
+            "falloff": 1.46
+        },
+        {
+            "name": "Rect Light (3)",
+            "type": "rect",
+            "tag": "",
+            "p0": [0.56, 6.38, -11.51],
+            "p1": [-0.56, 6.38, -11.51],
+            "distance": 2.22,
+            "angle": 4.712389,
+            "longSideSegs": 8,
+            "color": [0.8, 0.8, 1.0],
+            "intensity": 8.05,
+            "radius": 96.5,
+            "falloff": 1.46
+        },
+        {
+            "name": "Rect Light (1)",
+            "type": "rect",
+            "tag": "",
+            "p0": [-0.71, 11.0, -10.76],
+            "p1": [0.41, 11.0, -10.76],
+            "distance": 2.22,
+            "angle": 1.5707964,
+            "longSideSegs": 8,
+            "color": [0.8, 0.8, 1.0],
+            "intensity": 8.05,
+            "radius": 50.0,
+            "falloff": 1.46
+        },
+        {
+            "name": "Line Light",
+            "type": "line",
+            "tag": "",
+            "start": [-9.6, 5.35, 8.375],
+            "end": [-0.4, 9.45, 8.375],
+            "segments": 10,
+            "color": [0.8, 0.8, 1.0],
+            "intensity": 3.0,
+            "radius": 10.0,
+            "falloff": 1.46
+        },
+        {
+            "name": "Line Light (1)",
+            "type": "line",
+            "tag": "",
+            "start": [-9.6, 5.35, 12.975],
+            "end": [-0.4, 9.45, 12.975],
+            "segments": 10,
+            "color": [0.8, 0.8, 1.0],
+            "intensity": 8.05,
+            "radius": 10.0,
+            "falloff": 1.25
         }
     ],
     "fonts": [
@@ -355,9 +660,7 @@
         }
     ],
     "globalscripts": [
-        "assets/scripts/fps.lua",
-        "assets/scripts/cameras.lua"
     ],
     "ambient": 0.1,
-    "lightmapResScalar": 0.1
+    "lightmapResScalar": 0.01
 }
