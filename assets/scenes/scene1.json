@@ -4,7 +4,7 @@
             "name": "zombie1",
             "tag": "zombie",
             "transform": [
-                9.2, -1.6, -9.7,
+                2.35, 0.0, -9.7,
                 -34.0, 0.0, 0.0,
                 8.0, 8.0, 8.0
             ],
@@ -33,7 +33,7 @@
             "name": "zombie2",
             "tag": "zombie",
             "transform": [
-                -0.1, -1.6, -7.4,
+                -0.1, 0.0, -7.4,
                 42.0, 0.0, 0.0,
                 8.0, 8.0, 8.0
             ],
@@ -62,8 +62,8 @@
             "name": "zombie3",
             "tag": "zombie",
             "transform": [
-                9.4, 3.3, 5.05,
-                -130.5, 0.0, 0.0,
+                7.2, 0.0, 1.9,
+                -120.0, 0.0, 0.0,
                 8.0, 8.0, 8.0
             ],
             "components": [
@@ -86,7 +86,7 @@
                 {
                     "ID": 9,
                     "intensity": 2.0,
-                    "color": [1.0, 0.5, 1.0]
+                    "color": [0.8029638, 0.53921187, 0.9554455]
                 }
             ],
             "parentbonename": "",
@@ -98,14 +98,14 @@
             "transform": [
                 0.0, 0.0, 0.0,
                 0.0, 0.0, 0.0,
-                0.3, 0.3, 0.3
+                5.0, 5.0, 5.0
             ],
             "components": [
                 {
                     "ID": 1,
-                    "meshpath": "assets/objects/dungeon/dungeon_skel.obj",
-                    "texpath": "assets/objects/dungeon/dungeon_skel.png",
-                    "texscale": 20.0,
+                    "meshpath": "assets/objects/dungeon/FACILITY.obj",
+                    "texpath": "assets/objects/dungeon/FACILITY.png",
+                    "texscale": 10.0,
                     "pixelated": false,
                     "draw": true
                 },
@@ -120,35 +120,10 @@
             "children": []
         },
         {
-            "name": "test sound",
-            "tag": "",
-            "transform": [
-                0.0, 0.0, 0.0,
-                0.0, 0.0, 0.0,
-                1.0, 1.0, 1.0
-            ],
-            "components": [
-                {
-                    "ID": 7,
-                    "path": "assets/sounds/test.wav",
-                    "volume": 1.0,
-                    "maxDistance": 30.0,
-                    "falloff": 5.0,
-                    "loop": true
-                },
-                {
-                    "ID": 8,
-                    "path": "assets/scripts/sound.lua"
-                }
-            ],
-            "parentbonename": "",
-            "children": []
-        },
-        {
             "name": "player",
             "tag": "",
             "transform": [
-                0.0, -2.75, 0.0,
+                0.0, 7.5, 0.0,
                 0.0, 0.0, 0.0,
                 1.0, 1.0, 1.0
             ],
@@ -228,34 +203,82 @@
             ]
         },
         {
-            "name": "testcam",
+            "name": "light1",
             "tag": "",
             "transform": [
-                0.0, 10.0, 0.0,
-                90.0, -90.0, 0.0,
+                0.0, 11.11, 0.0,
+                0.0, 0.0, 0.0,
                 1.0, 1.0, 1.0
             ],
             "components": [
                 {
-                    "ID": 2,
-                    "FOV": 90,
-                    "isCurrent": false
+                    "ID": 1,
+                    "meshpath": "assets/objects/lights/rectlight.obj",
+                    "texpath": "assets/objects/lights/rectlight.png",
+                    "texscale": 1.0,
+                    "pixelated": true,
+                    "draw": true
                 }
             ],
             "parentbonename": "",
-            "children": []
+            "children": [
+                {
+                    "name": "Object",
+                    "tag": "",
+                    "transform": [
+                        0.0, 0.0, 0.0,
+                        0.0, 0.0, 0.0,
+                        1.0, 1.0, 1.0
+                    ],
+                    "components": [
+                        {
+                            "ID": 1,
+                            "meshpath": "assets/objects/lights/rectlightmid.obj",
+                            "texpath": "assets/objects/lights/rectlightmid.png",
+                            "texscale": 1.0,
+                            "pixelated": true,
+                            "draw": true
+                        },
+                        {
+                            "ID": 9,
+                            "intensity": 2.0,
+                            "color": [0.5, 0.5, 1.0]
+                        }
+                    ],
+                    "parentbonename": "",
+                    "children": []
+                }
+            ]
         }
     ],
     "lights": [
         {
-            "name": "light1",
-            "type": "point",
+            "name": "light2",
+            "type": "rect",
             "tag": "",
-            "pos": [0.0, 4.0, 0.0],
-            "color": [1.0, 1.0, 1.0],
+            "p0": [0.95, 0.35, 0.0],
+            "p1": [-0.85, 1.55, 0.0],
+            "distance": 3.49,
+            "angle": 1.6144296,
+            "longSideSegs": 10,
+            "color": [0.0, 1.0, 1.0],
             "intensity": 80.0,
-            "radius": 40.0,
-            "falloff": 0.4
+            "radius": 1.55,
+            "falloff": 0.791
+        },
+        {
+            "name": "Rect Light",
+            "type": "rect",
+            "tag": "",
+            "p0": [-0.56, 11.0, -0.56],
+            "p1": [0.56, 11.0, -0.56],
+            "distance": 2.22,
+            "angle": 1.5707964,
+            "longSideSegs": 8,
+            "color": [0.8, 0.8, 1.0],
+            "intensity": 8.05,
+            "radius": 96.5,
+            "falloff": 1.46
         }
     ],
     "fonts": [
@@ -335,7 +358,6 @@
         "assets/scripts/fps.lua",
         "assets/scripts/cameras.lua"
     ],
-    "ambient": 0.4,
+    "ambient": 0.1,
     "lightmapResScalar": 0.1
 }
-

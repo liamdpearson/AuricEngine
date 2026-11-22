@@ -1,5 +1,6 @@
 #include "include/lighting/lightmap.h"
 
+#include <glm/geometric.hpp>
 #include <xatlas/xatlas.h>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/rotate_vector.hpp>
@@ -249,24 +250,69 @@ static void bakeLightmap(LightMapComponent* lm, MeshComponent* mesh)
                             float b = 1/(1+(light->radius/light->falloff)*(light->radius/light->falloff));
                             float denom = 1 - b;
 
-                            float atten = light->intensity/(float)light->segments * (a - b) / denom;
+                            float atten = light->intensity/(float)(light->segments+1) * (a - b) / denom;
                             atten = std::max(atten, 0.0f);  // this line kinda useless but better safe than sorry
 
                             lit += light->color * lambert * atten;
                         }
                     }
                     else if (const RectLight* light = dynamic_cast<const RectLight*>(l)) {
-                        const glm::vec3 p0p1 = light->p1 - light->p0;
-                        glm::vec3 parallel{1.0f, 0.0f, 0.0f};
-                        
-                        parallel = glm::normalize(parallel - glm::dot(parallel, p0p1) / glm::dot(p0p1, p0p1) * p0p1);
-                        glm::vec3 dir = glm::rotate(parallel, light->angle, glm::normalize(p0p1)) * light->distance;
+                        const glm::vec3 p0 = light->p0, p1 = light->p1;
+                        const glm::vec3 p0p1 = p1 - p0;
+                        const glm::vec3 n = glm::normalize(p0p1);
+                        glm::vec3 ref = std::abs(n.x) > 0.99f ? glm::vec3{0,1,0} : glm::vec3{1,0,0};
+
+                        ref = glm::normalize(ref - glm::dot(ref, n) * n);
+                        const glm::vec3 dir = glm::rotate(ref, light->angle, glm::normalize(p0p1)) * light->distance;
 
                         float d1 = glm::length(p0p1);
                         float d2 = light->distance;
 
-                        const glm::vec3 p0 = light->p0, p1 = light->p1;
-                        const glm::vec3 p2 = p0 + dir, p3 = p1 + dir;
+                        const glm::vec3 p2 = p0 + dir;
+                        const glm::vec3 p0p2 = p2 - p0;
+
+                        int aSegs; // the segments from p0 to p1
+                        int bSegs; // the segments from p0 to p2
+
+                        if (d1 > d2) {
+                            aSegs = light->longSideSegs;
+                            bSegs = (int)(light->longSideSegs * d2/d1);
+                        } else {
+                            bSegs = light->longSideSegs;
+                            aSegs = (int)(light->longSideSegs * d1/d2);
+                        }
+
+                        aSegs = aSegs < 1 ? 1 : aSegs;
+                        bSegs = bSegs < 1 ? 1 : bSegs;
+
+                        for (int i = 0; i <= aSegs; ++i) {
+                            glm::vec3 aOff = p0p1/(float)aSegs * (float)i;
+
+                            for (int j = 0; j <= bSegs; ++j) {
+                                glm::vec3 bOff = p0p2/(float)bSegs * (float)j;
+                                const glm::vec3 pos = p0 + aOff + bOff;
+
+                                glm::vec3 toLight = pos - worldPos;
+                                float dist = glm::length(toLight);
+                                if (dist < 0.0001f || dist > light->radius) continue;
+
+                                glm::vec3 dir = toLight / dist;
+                                float lambert = glm::max(glm::dot(worldNorm, dir), 0.0f);
+                                if (lambert <= 0) continue;
+
+                                glm::vec3 origin = worldPos + worldNorm * 1e-3f; // shadow bias
+                                if (Physics::rayOccluded(origin, dir, dist, rootNode)) continue;
+                                
+                                float a = 1/(1+(dist/light->falloff)*(dist/light->falloff));
+                                float b = 1/(1+(light->radius/light->falloff)*(light->radius/light->falloff));
+                                float denom = 1 - b;
+
+                                float atten = light->intensity/(float)((aSegs+1) * (bSegs+1)) * (a - b) / denom;
+                                atten = std::max(atten, 0.0f);  // this line kinda useless but better safe than sorry
+
+                                lit += light->color * lambert * atten;
+                            }
+                        }
                     }
                 }
                 // hue preservation clamp

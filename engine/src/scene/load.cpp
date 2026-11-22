@@ -212,7 +212,30 @@ static Light* buildLight(const json& node)
         light->start = glm::vec3{start.at(0).get<float>(), start.at(1).get<float>(), start.at(2).get<float>()};
         light->end = glm::vec3{end.at(0).get<float>(), end.at(1).get<float>(), end.at(2).get<float>()};
 
-        light->segments = node.value("segments", 1);
+        light->segments = node.value("segments", 2);
+
+        light->name = name;
+        light->tag = tag;
+
+        light->color = color;
+        light->intensity = intensity;
+        light->radius = radius;
+        light->falloff = falloff;
+        
+        return light;
+    }
+    else if (type == "rect") {
+        RectLight* light = new RectLight{};
+
+        const json p0 = node.at("p0");
+        const json p1 = node.at("p1");
+
+        light->p0 = glm::vec3{p0.at(0).get<float>(), p0.at(1).get<float>(), p0.at(2).get<float>()};
+        light->p1 = glm::vec3{p1.at(0).get<float>(), p1.at(1).get<float>(), p1.at(2).get<float>()};
+
+        light->longSideSegs = node.value("longSideSegs", 1);
+        light->distance = node.value("distance", 0.0f);
+        light->angle = node.value("angle", 0.0f);
 
         light->name = name;
         light->tag = tag;

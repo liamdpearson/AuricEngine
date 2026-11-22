@@ -3,6 +3,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>         // value_ptr (hand a matrix to OpenGL)
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/rotate_vector.hpp>
 #include <xatlas/xatlas.h>
 
 #include <vector>
@@ -66,12 +68,64 @@ glm::vec3 sampleLightAt(const glm::vec3& p)
                 float b = 1/(1+(light->radius/light->falloff)*(light->radius/light->falloff));
                 float denom = 1 - b;
 
-                float atten = light->intensity/(float)light->segments * (a - b) / denom;
+                float atten = light->intensity/(float)(light->segments+1) * (a - b) / denom;
                 atten = std::max(atten, 0.0f); // this line kinda useless(line 34) but better safe than sorry
                 lit += light->color * atten;
             }
         }
-        
+        else if (const RectLight* light = dynamic_cast<const RectLight*>(l)) {
+            const glm::vec3 p0 = light->p0, p1 = light->p1;
+            const glm::vec3 p0p1 = p1 - p0;
+            const glm::vec3 n = glm::normalize(p0p1);
+            glm::vec3 ref = std::abs(n.x) > 0.99f ? glm::vec3{0,1,0} : glm::vec3{1,0,0};
+            
+            ref = glm::normalize(ref - glm::dot(ref, n) * n);
+            const glm::vec3 dir = glm::rotate(ref, light->angle, glm::normalize(p0p1)) * light->distance;
+
+            float d1 = glm::length(p0p1);
+            float d2 = light->distance;
+
+            const glm::vec3 p2 = p0 + dir;
+            const glm::vec3 p0p2 = p2 - p0;
+
+            int aSegs; // the segments from p0 to p1
+            int bSegs; // the segments from p0 to p2
+
+            if (d1 > d2) {
+                aSegs = light->longSideSegs;
+                bSegs = (int)(light->longSideSegs * d2/d1);
+            } else {
+                bSegs = light->longSideSegs;
+                aSegs = (int)(light->longSideSegs * d1/d2);
+            }
+
+            aSegs = aSegs < 1 ? 1 : aSegs;
+            bSegs = bSegs < 1 ? 1 : bSegs;
+
+            for (int i = 0; i <= aSegs; ++i) {
+                glm::vec3 aOff = p0p1/(float)aSegs * (float)i;
+
+                for (int j = 0; j <= bSegs; ++j) {
+                    glm::vec3 bOff = p0p2/(float)bSegs * (float)j;
+                    const glm::vec3 pos = p0 + aOff + bOff;
+
+                    glm::vec3 toLight = pos - p;
+                    float dist = glm::length(toLight);
+                    if (dist > light->radius) continue;
+                    glm::vec3 dir = glm::normalize(toLight);
+
+                    if (Physics::rayOccluded(p, dir, dist, rootNode)) continue;
+                    
+                    float a = 1/(1+(dist/light->falloff)*(dist/light->falloff));
+                    float b = 1/(1+(light->radius/light->falloff)*(light->radius/light->falloff));
+                    float denom = 1 - b;
+
+                    float atten = light->intensity/(float)((aSegs+1) * (bSegs+1)) * (a - b) / denom;
+                    atten = std::max(atten, 0.0f); // this line kinda useless(line 34) but better safe than sorry
+                    lit += light->color * atten;
+                }
+            }
+        }
     }
     // if r, g, or b is over 1.0f then divide them all by the largest one. this
     // will force the values between 0 and 1 while still preserving the hue
@@ -122,11 +176,67 @@ std::pair<glm::vec3, glm::vec3> sampleLightAndDir(const glm::vec3& p)
                 float b = 1/(1+(light->radius/light->falloff)*(light->radius/light->falloff));
                 float denom = 1 - b;
 
-                float atten = light->intensity/(float)light->segments * (a - b) / denom;
+                float atten = light->intensity/(float)(light->segments+1) * (a - b) / denom;
                 atten = std::max(atten, 0.0f); // this line kinda useless but better safe than sorry
                 lit += light->color * atten;
 
                 dir += d * atten;
+            }
+        }
+        else if (const RectLight* light = dynamic_cast<const RectLight*>(l)) {
+            const glm::vec3 p0 = light->p0, p1 = light->p1;
+            const glm::vec3 p0p1 = p1 - p0;
+            const glm::vec3 n = glm::normalize(p0p1);
+            glm::vec3 ref = std::abs(n.x) > 0.99f ? glm::vec3{0,1,0} : glm::vec3{1,0,0};
+            
+            ref = glm::normalize(ref - glm::dot(ref, n) * n);
+            const glm::vec3 dd = glm::rotate(ref, light->angle, glm::normalize(p0p1)) * light->distance;
+
+            float d1 = glm::length(p0p1);
+            if (d1 < 1e-6f) continue;
+            float d2 = light->distance;
+
+            const glm::vec3 p2 = p0 + dd;
+            const glm::vec3 p0p2 = p2 - p0;
+
+            int aSegs; // the segments from p0 to p1
+            int bSegs; // the segments from p0 to p2
+
+            if (d1 > d2) {
+                aSegs = light->longSideSegs;
+                bSegs = (int)(light->longSideSegs * d2/d1);
+            } else {
+                bSegs = light->longSideSegs;
+                aSegs = (int)(light->longSideSegs * d1/d2);
+            }
+
+            aSegs = aSegs < 1 ? 1 : aSegs;
+            bSegs = bSegs < 1 ? 1 : bSegs;
+
+            for (int i = 0; i <= aSegs; ++i) {
+                glm::vec3 aOff = p0p1/(float)aSegs * (float)i;
+
+                for (int j = 0; j <= bSegs; ++j) {
+                    glm::vec3 bOff = p0p2/(float)bSegs * (float)j;
+                    const glm::vec3 pos = p0 + aOff + bOff;
+
+                    glm::vec3 toLight = pos - p;
+                    float dist = glm::length(toLight);
+                    if (dist < 0.00001f || dist > light->radius) continue;
+                    glm::vec3 d = glm::normalize(toLight);
+
+                    if (Physics::rayOccluded(p, d, dist, rootNode)) continue;
+                    
+                    float a = 1/(1+(dist/light->falloff)*(dist/light->falloff));
+                    float b = 1/(1+(light->radius/light->falloff)*(light->radius/light->falloff));
+                    float denom = 1 - b;
+
+                    float atten = light->intensity/(float)((aSegs+1) * (bSegs+1)) * (a - b) / denom;
+                    atten = std::max(atten, 0.0f); // this line kinda useless but better safe than sorry
+                    lit += light->color * atten;
+
+                    dir += d * atten;
+                }
             }
         }
     }

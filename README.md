@@ -108,11 +108,9 @@ Prerequisites: GCC, git, and CMake 3.16 or newer.
 
 
 ## Short Term Goals:
-- Add an alpha toggle for textures
 - Finish rectangle lights
 - Finish test scene
 
 ## Long Term Goals:
 - Add a decal system
 - Add a particle system
-- Add editor with ImGui

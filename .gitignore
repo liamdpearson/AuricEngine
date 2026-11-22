@@ -1,6 +1,6 @@
-build*/
-build-wsl*/
+build/
+editor/
 release.exe
 reldbg.exe
-.clangd
-COMPONENT.md
+editor.exe
+editor.ini

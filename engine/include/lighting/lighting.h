@@ -39,7 +39,7 @@ struct RectLight: Light
 {
     glm::vec3 p0, p1;
     float angle, distance;
-    float segmentMultiplier;
+    int longSideSegs;
 };
 
 struct LightGrid
