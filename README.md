@@ -27,7 +27,7 @@ This project is still in its early stages of development. I doubt it will ever b
 - UI hierarchy with types: UIImage and UIText as children of UIElement
 - Basic collisions and raycasting for capsules
 - BVH for raycasting against static meshes
-- Baked light maps for static meshes with point and line lights
+- Baked light maps for static meshes with point, line, and rectangle lights
 - Light grid for dynamic meshes containing light value and dominant light direction
 - Mesh support from .obj and .fbx files
 - Armature and animation support from .fbx files
