@@ -69,6 +69,8 @@ int main()
     if (!Scene::loadScene(Scene::startupScene.c_str())) return 0;
     Scripting::initScripting();
 
+    if (!Audio::initAudio()) return 0;
+
     // initial compose loop
     forEachObj([](Object& obj) {
         if (!obj.parent) {
@@ -97,12 +99,22 @@ int main()
             cam->front = glm::normalize(-glm::vec3(w[2]));
             cam->up    = glm::normalize(glm::vec3(w[1]));
         }
+        // update audiosources
+        AudioSourceComponent* aud = obj.getComponent<AudioSourceComponent>();
+        if (aud) {
+            Audio::updateAudioSource(aud);
+        }
     });
+
+    // forEachObj([](Object& obj) {
+    //     AudioSourceComponent* aud = obj.getComponent<AudioSourceComponent>();
+    //     if (aud) {
+    //         Audio::playAudioSource(aud);
+    //     }
+    // });
 
     Lighting::bakeSceneLighting();
     Physics::collectSceneColliders();
-
-    if (!Audio::initAudio()) return 0;
 
     // upload mesh components
     forEachObj([](Object& obj) {
@@ -197,6 +209,12 @@ int main()
                 cam->pos = glm::vec3(w[3]);
                 cam->front = glm::normalize(-glm::vec3(w[2]));
                 cam->up    = glm::normalize(glm::vec3(w[1]));
+            }
+
+            // update audiosources
+            AudioSourceComponent* aud = obj.getComponent<AudioSourceComponent>();
+            if (aud) {
+                Audio::updateAudioSource(aud);
             }
         });
 

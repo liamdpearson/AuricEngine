@@ -17,6 +17,8 @@ void playSound2D(const char* path, float vol);
 
 void playAudioSource(AudioSourceComponent* as);
 
+void updateAudioSource(AudioSourceComponent* as);
+
 void stopAudioSource(AudioSourceComponent* as);
 
 void uninitializeAudioSource(AudioSourceComponent* as);

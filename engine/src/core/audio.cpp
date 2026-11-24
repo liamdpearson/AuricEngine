@@ -1,13 +1,19 @@
 #include "include/core/audio.h"
 #include "audio_internal.h"
+#include "include/physics/collisions.h"
+#include "include/physics/raycast.h"
 #include "include/scene/object.h"
+#include "include/render/graphics.h"
 
+#include <chrono>
 #include <iostream>
 #include <algorithm>
 
 
 namespace Auric::Audio
 {
+
+static unsigned int frames = 0;
 
 int initAudio()
 {
@@ -129,6 +135,24 @@ void playAudioSource(AudioSourceComponent* as)
 
 }
 
+void updateAudioSource(AudioSourceComponent* as)
+{
+    if (!initialized || as->index < 0 || !voices[as->index].initialized) return;
+
+    glm::vec3 pos{as->owner->transform.x, as->owner->transform.y, as->owner->transform.z};
+    ma_sound& sound = voices[as->index].sound;
+    ma_sound_set_position(&sound, pos.x, pos.y, pos.z);
+
+
+    if (frames % 1 == 0) {
+        if (Physics::rayOccluded(listener, pos, Physics::rootNode)) {
+            ma_sound_set_volume(&sound, as->volume * 0.0f);
+        } else {
+            ma_sound_set_volume(&sound, as->volume);
+        }
+    }
+}
+
 void stopAudioSource(AudioSourceComponent* as)
 {
     if (as->index >= 0) {
@@ -154,6 +178,8 @@ void uninitializeAudioSource(AudioSourceComponent* as)
 void updateAudio(const glm::vec3& pos, const glm::vec3& front, const glm::vec3& up)
 {
     if (!initialized) return;
+
+    frames++;
 
     listener = pos;
 
