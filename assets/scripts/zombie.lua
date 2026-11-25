@@ -14,6 +14,8 @@ local moveDir
 local time = 0
 local attackTimer = 0.7
 
+local soundPlayer
+
 
 function start()
     mesh = self:getMesh()
@@ -24,6 +26,10 @@ function start()
     player = find.obj("player")
     playerCapsule = player:getCapsuleCollider()
     playerScript = player:getScript()
+
+    sound = find.childObj("sound", self)
+    soundPlayer = sound:getAudioSource()
+    soundPlayer:Play()
 end
 
 function hit(damage)
@@ -33,6 +39,7 @@ function hit(damage)
     if health <= 0 then
         state = 3
         time = 0
+        groanSound:Stop()
     end
 end
 

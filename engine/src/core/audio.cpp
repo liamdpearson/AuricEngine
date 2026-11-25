@@ -121,6 +121,7 @@ static int initSound(const char* path, const glm::vec3& pos, float vol, bool loo
 
 void playAudioSource(AudioSourceComponent* as)
 {
+    if (!initialized) return;
     if (as->index < 0) {
         glm::vec3 pos{as->owner->transform.x, as->owner->transform.y, as->owner->transform.z};
         int i = initSound(as->path.c_str(), pos, as->volume, as->loop);
@@ -139,16 +140,31 @@ void updateAudioSource(AudioSourceComponent* as)
 {
     if (!initialized || as->index < 0 || !voices[as->index].initialized) return;
 
-    glm::vec3 pos{as->owner->transform.x, as->owner->transform.y, as->owner->transform.z};
+    glm::vec3 pos = as->owner->getWorld()[3];
     ma_sound& sound = voices[as->index].sound;
     ma_sound_set_position(&sound, pos.x, pos.y, pos.z);
 
 
-    if (frames % 1 == 0) {
+    float dist = glm::length(listener - pos);
+    float falloff;
+
+    if (as->falloff <= 0) falloff = 0.1f;
+    else falloff = as->falloff;
+    float vol = 0.0f;
+
+    if (dist < as->maxDistance) {
+        float a = 1/(1+(dist/falloff)*(dist/falloff));
+        float b = 1/(1+(as->maxDistance/falloff)*(as->maxDistance/falloff));
+        float denom = 1 - b;
+
+        vol = as->volume * (a - b) / denom;
+    }
+
+    if (frames % 500 == 0) {
         if (Physics::rayOccluded(listener, pos, Physics::rootNode)) {
-            ma_sound_set_volume(&sound, as->volume * 0.0f);
+            ma_sound_set_volume(&sound, vol * 0.65f);
         } else {
-            ma_sound_set_volume(&sound, as->volume);
+            ma_sound_set_volume(&sound, vol);
         }
     }
 }

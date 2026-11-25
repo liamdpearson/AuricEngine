@@ -198,6 +198,10 @@ static void registerLuaAPI()
         Object* obj = findObject(name, rootObjs);
         return obj;
     });
+    find.set_function("childObj", [](const std::string& name, Object& obj) {
+        Object* child = findObject(name, obj.children);
+        return child;
+    });
     find.set_function("ui", [](const std::string& name) {
         UIElement* ui = findUIElement(name, UI::uiRoots);
         return uiToLua(ui);

@@ -27,7 +27,29 @@
                 }
             ],
             "parentbonename": "",
-            "children": []
+            "children": [
+                {
+                    "name": "sound",
+                    "tag": "",
+                    "transform": [
+                        0.0, 0.0, 0.0,
+                        0.0, 0.0, 0.0,
+                        1.0, 1.0, 1.0
+                    ],
+                    "components": [
+                        {
+                            "ID": 7,
+                            "path": "assets/sounds/zombiegroan.mp3",
+                            "volume": 8.0,
+                            "maxDistance": 20.0,
+                            "falloff": 1.0,
+                            "loop": true
+                        }
+                    ],
+                    "parentbonename": "Jaw_01",
+                    "children": []
+                }
+            ]
         },
         {
             "name": "zombie2",
@@ -56,7 +78,29 @@
                 }
             ],
             "parentbonename": "",
-            "children": []
+            "children": [
+                {
+                    "name": "sound",
+                    "tag": "",
+                    "transform": [
+                        0.42, 0.0, -0.0087,
+                        -76.0, 0.0, 0.0,
+                        1.0, 1.0, 1.0
+                    ],
+                    "components": [
+                        {
+                            "ID": 7,
+                            "path": "assets/sounds/zombiegroan.mp3",
+                            "volume": 8.0,
+                            "maxDistance": 20.0,
+                            "falloff": 1.0,
+                            "loop": true
+                        }
+                    ],
+                    "parentbonename": "Jaw_01",
+                    "children": []
+                }
+            ]
         },
         {
             "name": "zombie3",
@@ -85,7 +129,29 @@
                 }
             ],
             "parentbonename": "",
-            "children": []
+            "children": [
+                {
+                    "name": "sound",
+                    "tag": "",
+                    "transform": [
+                        -0.9526, 0.0, 1.25,
+                        86.0, 0.0, 0.0,
+                        1.0, 1.0, 1.0
+                    ],
+                    "components": [
+                        {
+                            "ID": 7,
+                            "path": "assets/sounds/zombiegroan.mp3",
+                            "volume": 8.0,
+                            "maxDistance": 20.0,
+                            "falloff": 1.0,
+                            "loop": true
+                        }
+                    ],
+                    "parentbonename": "Jaw_01",
+                    "children": []
+                }
+            ]
         },
         {
             "name": "dungeon",
