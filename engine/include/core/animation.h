@@ -52,6 +52,7 @@ struct Rig
     float animTime = 0.0f; // seconds into current clip
     int nextAnim = -1;     // animation set to play after current one done
     float animSpeed = 1.0f;
+    bool still = false;
 
     // lastPose is updated every frame (what player last saw)
     // blendFrom is empty unless currently fading between animations
@@ -62,6 +63,7 @@ struct Rig
 
     void setAnim(int index, float blendTime = 0.0f, int nextAnim = -1)
     {
+        this->still = false;
         if (index < 0 || index >= (int)animations.size()) return;
         
         // blend from the pose on screen if animation is already running

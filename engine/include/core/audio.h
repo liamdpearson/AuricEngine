@@ -15,7 +15,9 @@ void setMasterVolume(float vol);
 
 void playSound2D(const char* path, float vol);
 
-void playAudioSource(AudioSourceComponent* as);
+void playAudioSource(AudioSourceComponent* as, const std::string& newPath = "");
+
+bool isPlaying(AudioSourceComponent* as);
 
 void updateAudioSource(AudioSourceComponent* as);
 

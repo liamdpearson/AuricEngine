@@ -119,11 +119,17 @@ static int initSound(const char* path, const glm::vec3& pos, float vol, bool loo
     return i;
 }
 
-void playAudioSource(AudioSourceComponent* as)
+void playAudioSource(AudioSourceComponent* as, const std::string& newPath)
 {
     if (!initialized) return;
+
+    if (!newPath.empty()) {
+        as->path = newPath;
+        stopAudioSource(as);
+    }
+
     if (as->index < 0) {
-        glm::vec3 pos{as->owner->transform.x, as->owner->transform.y, as->owner->transform.z};
+        glm::vec3 pos = as->owner->getWorld()[3];
         int i = initSound(as->path.c_str(), pos, as->volume, as->loop);
         if (i < 0) return;
         as->index = i; 
@@ -136,9 +142,18 @@ void playAudioSource(AudioSourceComponent* as)
 
 }
 
+bool isPlaying(AudioSourceComponent* as)
+{
+    return (as->index >= 0);
+}
+
 void updateAudioSource(AudioSourceComponent* as)
 {
     if (!initialized || as->index < 0 || !voices[as->index].initialized) return;
+
+    if (ma_sound_at_end(&voices[as->index].sound)) {
+        stopAudioSource(as); return;
+    }
 
     glm::vec3 pos = as->owner->getWorld()[3];
     ma_sound& sound = voices[as->index].sound;
@@ -160,7 +175,7 @@ void updateAudioSource(AudioSourceComponent* as)
         vol = as->volume * (a - b) / denom;
     }
 
-    if (frames % 500 == 0) {
+    if (frames % 1 == 0) {
         if (Physics::rayOccluded(listener, pos, Physics::rootNode)) {
             ma_sound_set_volume(&sound, vol * 0.65f);
         } else {

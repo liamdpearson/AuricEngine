@@ -29,17 +29,26 @@ function start()
 
     sound = find.childObj("sound", self)
     soundPlayer = sound:getAudioSource()
-    soundPlayer:Play()
 end
 
 function hit(damage)
+    if state == 3 then
+        return
+    end
+
     damage = damage or 1
     health = health - damage
     capsule.velocity = capsule.velocity - toPlayer:normalized() * 5.0
     if health <= 0 then
         state = 3
         time = 0
-        groanSound:Stop()
+        soundPlayer.volume = 10
+        soundPlayer:Play("assets/sounds/zombiedeath.mp3")
+        rig:setAnim(3, 0.1, -2)
+    else
+        num = math.random(1, 3)
+        soundPlayer.volume = 5
+        soundPlayer:Play("assets/sounds/zombiehit" .. tostring(num) .. ".mp3")
     end
 end
 
@@ -88,6 +97,10 @@ function update(deltaTime)
         state = 0
         if distance < 10 then
             if not raycast.occluded(head, playerHead) then
+                if not soundPlayer:isPlaying() then
+                    soundPlayer.volume = 8
+                    soundPlayer:Play("assets/sounds/zombiegroan.mp3")
+                end
                 moveDir = toPlayer
                 moveDir.y = 0.0
                 moveDir:normalize()
@@ -113,10 +126,6 @@ function update(deltaTime)
 
     resolveMovement(deltaTime)
     
-    if state == 3 and time > 1.125 then
-        rig.animSpeed = 0
-        return
-    end
     if rig.currentAnim ~= state then
         rig:setAnim(state, 0.5)
     end

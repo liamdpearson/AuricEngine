@@ -167,16 +167,24 @@ int main()
 
         Input::endFrameInput();
 
+
         // compute poses for rigs
         forEachObj([](Object& obj) {
             RigComponent* r = obj.getComponent<RigComponent>();
             if (!r) return;
             Rig& rig = r->rig;
 
-            rig.animTime += deltaTime * rig.animSpeed;
+            if (!rig.still) rig.animTime += deltaTime * rig.animSpeed;
+
             if (rig.nextAnim != -1) {
-                if (rig.animations[rig.currentAnim].duration - rig.animTime <= 0) // if cur anim done
-                    { rig.setAnim(rig.nextAnim, 0.1f); rig.nextAnim = -1; }
+                if (rig.animations[rig.currentAnim].duration - rig.animTime <= 0) { // if cur anim done
+                    if (rig.nextAnim == -2) {
+                        rig.still = true; 
+                        rig.animTime = rig.animations[rig.currentAnim].duration - 0.01f;
+                    } else {
+                        rig.setAnim(rig.nextAnim, 0.1f); rig.nextAnim = -1;
+                    }
+                }
             }
             if (rig.blendDuration > 0.0f) rig.blendElapsed += deltaTime;
             Animate::computePose(rig);

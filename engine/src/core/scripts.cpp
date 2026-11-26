@@ -156,8 +156,11 @@ static void registerLuaAPI()
     lua.new_usertype<AudioSourceComponent>("AudioSource",
         "loop", &AudioSourceComponent::loop,
         "volume", &AudioSourceComponent::volume,
-        "Play", [](AudioSourceComponent* audiosource) {
-            Audio::playAudioSource(audiosource); 
+        "Play", [](AudioSourceComponent* audiosource, const std::string& newPath = "") {
+            Audio::playAudioSource(audiosource, newPath); 
+        },
+        "isPlaying", [](AudioSourceComponent* audiosource) {
+            return Audio::isPlaying(audiosource);
         },
         "Stop", [](AudioSourceComponent* audiosource) {
             Audio::stopAudioSource(audiosource); 

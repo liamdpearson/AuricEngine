@@ -28,8 +28,7 @@ static void sampleClip(const Animation& anim, float t, std::vector<BonePose>& ou
     }
 }
 
-// fills palette with each bone's skinning matrix, doesn't take
-// AnimatedMesh by const ref because it needs to set its lastPose
+// fills palette with each bone's skinning matrix
 void computePose(Rig& rig)
 {
     const Skeleton& sk = rig.skeleton;
