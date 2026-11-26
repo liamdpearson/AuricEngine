@@ -95,7 +95,7 @@ function update(deltaTime)
         distance = toPlayer:length()
 
         state = 0
-        if distance < 10 then
+        if distance < 50 then
             if not raycast.occluded(head, playerHead) then
                 if not soundPlayer:isPlaying() then
                     soundPlayer.volume = 8

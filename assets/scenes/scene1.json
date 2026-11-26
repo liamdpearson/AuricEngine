@@ -13,7 +13,7 @@
                     "ID": 1,
                     "meshpath": "assets/objects/zombie/zombie.fbx",
                     "texpath": "assets/objects/zombie/zombie.jpg",
-                    "pixelated": false,
+                    "pixelated": true,
                     "draw": true
                 },
                 {
@@ -64,7 +64,7 @@
                     "ID": 1,
                     "meshpath": "assets/objects/zombie/zombie.fbx",
                     "texpath": "assets/objects/zombie/zombie.jpg",
-                    "pixelated": false,
+                    "pixelated": true,
                     "draw": true
                 },
                 {
@@ -115,7 +115,7 @@
                     "ID": 1,
                     "meshpath": "assets/objects/zombie/zombie.fbx",
                     "texpath": "assets/objects/zombie/zombie.jpg",
-                    "pixelated": false,
+                    "pixelated": true,
                     "draw": true
                 },
                 {
@@ -166,7 +166,7 @@
                     "ID": 1,
                     "meshpath": "assets/objects/zombie/zombie.fbx",
                     "texpath": "assets/objects/zombie/zombie.jpg",
-                    "pixelated": false,
+                    "pixelated": true,
                     "draw": true
                 },
                 {
@@ -217,7 +217,7 @@
                     "ID": 1,
                     "meshpath": "assets/objects/zombie/zombie.fbx",
                     "texpath": "assets/objects/zombie/zombie.jpg",
-                    "pixelated": false,
+                    "pixelated": true,
                     "draw": true
                 },
                 {
@@ -268,7 +268,7 @@
                     "ID": 1,
                     "meshpath": "assets/objects/zombie/zombie.fbx",
                     "texpath": "assets/objects/zombie/zombie.jpg",
-                    "pixelated": false,
+                    "pixelated": true,
                     "draw": true
                 },
                 {
@@ -319,7 +319,7 @@
                     "ID": 1,
                     "meshpath": "assets/objects/zombie/zombie.fbx",
                     "texpath": "assets/objects/zombie/zombie.jpg",
-                    "pixelated": false,
+                    "pixelated": true,
                     "draw": true
                 },
                 {
@@ -370,7 +370,7 @@
                     "ID": 1,
                     "meshpath": "assets/objects/zombie/zombie.fbx",
                     "texpath": "assets/objects/zombie/zombie.jpg",
-                    "pixelated": false,
+                    "pixelated": true,
                     "draw": true
                 },
                 {
@@ -421,7 +421,7 @@
                     "ID": 1,
                     "meshpath": "assets/objects/zombie/zombie.fbx",
                     "texpath": "assets/objects/zombie/zombie.jpg",
-                    "pixelated": false,
+                    "pixelated": true,
                     "draw": true
                 },
                 {
@@ -472,7 +472,7 @@
                     "ID": 1,
                     "meshpath": "assets/objects/zombie/zombie.fbx",
                     "texpath": "assets/objects/zombie/zombie.jpg",
-                    "pixelated": false,
+                    "pixelated": true,
                     "draw": true
                 },
                 {
@@ -524,7 +524,7 @@
                     "meshpath": "assets/objects/dungeon/FACILITY.obj",
                     "texpath": "assets/objects/dungeon/FACILITY.png",
                     "texscale": 10.0,
-                    "pixelated": false,
+                    "pixelated": true,
                     "draw": true
                 },
                 {
@@ -605,7 +605,7 @@
                                     "ID": 1,
                                     "meshpath": "assets/objects/glock/glocknhands.fbx",
                                     "texpath": "assets/objects/glock/glocknhands.png",
-                                    "pixelated": false,
+                                    "pixelated": true,
                                     "draw": true
                                 },
                                 {
