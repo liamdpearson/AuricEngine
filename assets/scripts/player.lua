@@ -34,7 +34,7 @@ function resolveMovement(deltaTime)
         camnhands.transform.pitch = -90.0
     end
 
-    acceleration = 30.0 * deltaTime
+    acceleration = 45.0 * deltaTime
 
     moveDir = Vec3.new(0)
 

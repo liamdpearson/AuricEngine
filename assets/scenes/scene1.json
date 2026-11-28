@@ -1,427 +1,19 @@
 {
     "objects": [
         {
-            "name": "zombie1",
-            "tag": "zombie",
-            "transform": [
-                2.35, 0.0, -9.7,
-                -34.0, 0.0, 0.0,
-                8.0, 8.0, 8.0
-            ],
-            "components": [
-                {
-                    "ID": 1,
-                    "meshpath": "assets/objects/zombie/zombie.fbx",
-                    "texpath": "assets/objects/zombie/zombie.jpg",
-                    "pixelated": true,
-                    "draw": true
-                },
-                {
-                    "ID": 8,
-                    "path": "assets/scripts/zombie.lua"
-                },
-                {
-                    "ID": 6,
-                    "radius": 0.28,
-                    "height": 2.12
-                }
-            ],
-            "parentbonename": "",
-            "children": [
-                {
-                    "name": "sound",
-                    "tag": "",
-                    "transform": [
-                        0.0, 0.0, 0.0,
-                        0.0, 0.0, 0.0,
-                        1.0, 1.0, 1.0
-                    ],
-                    "components": [
-                        {
-                            "ID": 7,
-                            "path": "assets/sounds/zombiegroan.mp3",
-                            "volume": 8.0,
-                            "maxDistance": 20.0,
-                            "falloff": 1.0,
-                            "loop": false
-                        }
-                    ],
-                    "parentbonename": "Jaw_01",
-                    "children": []
-                }
-            ]
-        },
-        {
-            "name": "zombie2",
-            "tag": "zombie",
-            "transform": [
-                -0.1, 0.0, -7.4,
-                42.0, 0.0, 0.0,
-                8.0, 8.0, 8.0
-            ],
-            "components": [
-                {
-                    "ID": 1,
-                    "meshpath": "assets/objects/zombie/zombie.fbx",
-                    "texpath": "assets/objects/zombie/zombie.jpg",
-                    "pixelated": true,
-                    "draw": true
-                },
-                {
-                    "ID": 8,
-                    "path": "assets/scripts/zombie.lua"
-                },
-                {
-                    "ID": 6,
-                    "radius": 0.28,
-                    "height": 2.12
-                }
-            ],
-            "parentbonename": "",
-            "children": [
-                {
-                    "name": "sound",
-                    "tag": "",
-                    "transform": [
-                        0.0, 0.0, 0.0,
-                        -76.0, 0.0, 0.0,
-                        1.0, 1.0, 1.0
-                    ],
-                    "components": [
-                        {
-                            "ID": 7,
-                            "path": "assets/sounds/zombiegroan.mp3",
-                            "volume": 8.0,
-                            "maxDistance": 20.0,
-                            "falloff": 1.0,
-                            "loop": false
-                        }
-                    ],
-                    "parentbonename": "Jaw_01",
-                    "children": []
-                }
-            ]
-        },
-        {
-            "name": "zombie3",
-            "tag": "zombie",
-            "transform": [
-                7.2, 0.0, 1.9,
-                -120.0, 0.0, 0.0,
-                8.0, 8.0, 8.0
-            ],
-            "components": [
-                {
-                    "ID": 1,
-                    "meshpath": "assets/objects/zombie/zombie.fbx",
-                    "texpath": "assets/objects/zombie/zombie.jpg",
-                    "pixelated": true,
-                    "draw": true
-                },
-                {
-                    "ID": 8,
-                    "path": "assets/scripts/zombie.lua"
-                },
-                {
-                    "ID": 6,
-                    "radius": 0.28,
-                    "height": 2.12
-                }
-            ],
-            "parentbonename": "",
-            "children": [
-                {
-                    "name": "sound",
-                    "tag": "",
-                    "transform": [
-                        0.0, 0.0, 0.0,
-                        86.0, 0.0, 0.0,
-                        1.0, 1.0, 1.0
-                    ],
-                    "components": [
-                        {
-                            "ID": 7,
-                            "path": "assets/sounds/zombiegroan.mp3",
-                            "volume": 8.0,
-                            "maxDistance": 20.0,
-                            "falloff": 1.0,
-                            "loop": false
-                        }
-                    ],
-                    "parentbonename": "Jaw_01",
-                    "children": []
-                }
-            ]
-        },
-        {
-            "name": "zombie4",
-            "tag": "zombie",
-            "transform": [
-                0.1, 0.0, 1.9,
-                -220.5, 0.0, 0.0,
-                8.0, 8.0, 8.0
-            ],
-            "components": [
-                {
-                    "ID": 1,
-                    "meshpath": "assets/objects/zombie/zombie.fbx",
-                    "texpath": "assets/objects/zombie/zombie.jpg",
-                    "pixelated": true,
-                    "draw": true
-                },
-                {
-                    "ID": 8,
-                    "path": "assets/scripts/zombie.lua"
-                },
-                {
-                    "ID": 6,
-                    "radius": 0.28,
-                    "height": 2.12
-                }
-            ],
-            "parentbonename": "",
-            "children": [
-                {
-                    "name": "sound",
-                    "tag": "",
-                    "transform": [
-                        0.0, 0.0, 0.0,
-                        86.0, 0.0, 0.0,
-                        1.0, 1.0, 1.0
-                    ],
-                    "components": [
-                        {
-                            "ID": 7,
-                            "path": "assets/sounds/zombiegroan.mp3",
-                            "volume": 8.0,
-                            "maxDistance": 20.0,
-                            "falloff": 1.0,
-                            "loop": false
-                        }
-                    ],
-                    "parentbonename": "Jaw_01",
-                    "children": []
-                }
-            ]
-        },
-        {
-            "name": "zombie5",
-            "tag": "zombie",
-            "transform": [
-                -10.3, 0.0, -1.3,
-                -402.0, 0.0, 0.0,
-                8.0, 8.0, 8.0
-            ],
-            "components": [
-                {
-                    "ID": 1,
-                    "meshpath": "assets/objects/zombie/zombie.fbx",
-                    "texpath": "assets/objects/zombie/zombie.jpg",
-                    "pixelated": true,
-                    "draw": true
-                },
-                {
-                    "ID": 8,
-                    "path": "assets/scripts/zombie.lua"
-                },
-                {
-                    "ID": 6,
-                    "radius": 0.28,
-                    "height": 2.12
-                }
-            ],
-            "parentbonename": "",
-            "children": [
-                {
-                    "name": "sound",
-                    "tag": "",
-                    "transform": [
-                        0.0, 0.0, 0.0,
-                        86.0, 0.0, 0.0,
-                        1.0, 1.0, 1.0
-                    ],
-                    "components": [
-                        {
-                            "ID": 7,
-                            "path": "assets/sounds/zombiegroan.mp3",
-                            "volume": 8.0,
-                            "maxDistance": 20.0,
-                            "falloff": 1.0,
-                            "loop": false
-                        }
-                    ],
-                    "parentbonename": "Jaw_01",
-                    "children": []
-                }
-            ]
-        },
-        {
-            "name": "zombie6",
-            "tag": "zombie",
-            "transform": [
-                -11.55, 0.0, -8.1,
-                -280.5, 0.0, 0.0,
-                8.0, 8.0, 8.0
-            ],
-            "components": [
-                {
-                    "ID": 1,
-                    "meshpath": "assets/objects/zombie/zombie.fbx",
-                    "texpath": "assets/objects/zombie/zombie.jpg",
-                    "pixelated": true,
-                    "draw": true
-                },
-                {
-                    "ID": 8,
-                    "path": "assets/scripts/zombie.lua"
-                },
-                {
-                    "ID": 6,
-                    "radius": 0.28,
-                    "height": 2.12
-                }
-            ],
-            "parentbonename": "",
-            "children": [
-                {
-                    "name": "sound",
-                    "tag": "",
-                    "transform": [
-                        0.0, 0.0, 0.0,
-                        86.0, 0.0, 0.0,
-                        1.0, 1.0, 1.0
-                    ],
-                    "components": [
-                        {
-                            "ID": 7,
-                            "path": "assets/sounds/zombiegroan.mp3",
-                            "volume": 8.0,
-                            "maxDistance": 20.0,
-                            "falloff": 1.0,
-                            "loop": false
-                        }
-                    ],
-                    "parentbonename": "Jaw_01",
-                    "children": []
-                }
-            ]
-        },
-        {
-            "name": "zombie7",
-            "tag": "zombie",
-            "transform": [
-                -11.55, 2.4, 10.2,
-                -319.5, 0.0, 0.0,
-                8.0, 8.0, 8.0
-            ],
-            "components": [
-                {
-                    "ID": 1,
-                    "meshpath": "assets/objects/zombie/zombie.fbx",
-                    "texpath": "assets/objects/zombie/zombie.jpg",
-                    "pixelated": true,
-                    "draw": true
-                },
-                {
-                    "ID": 8,
-                    "path": "assets/scripts/zombie.lua"
-                },
-                {
-                    "ID": 6,
-                    "radius": 0.28,
-                    "height": 2.12
-                }
-            ],
-            "parentbonename": "",
-            "children": [
-                {
-                    "name": "sound",
-                    "tag": "",
-                    "transform": [
-                        0.0, 0.0, 1.25,
-                        86.0, 0.0, 0.0,
-                        1.0, 1.0, 1.0
-                    ],
-                    "components": [
-                        {
-                            "ID": 7,
-                            "path": "assets/sounds/zombiegroan.mp3",
-                            "volume": 8.0,
-                            "maxDistance": 20.0,
-                            "falloff": 1.0,
-                            "loop": false
-                        }
-                    ],
-                    "parentbonename": "Jaw_01",
-                    "children": []
-                }
-            ]
-        },
-        {
-            "name": "zombie8",
-            "tag": "zombie",
-            "transform": [
-                1.6, 7.05, 10.2,
-                -181.5, 0.0, 0.0,
-                8.0, 8.0, 8.0
-            ],
-            "components": [
-                {
-                    "ID": 1,
-                    "meshpath": "assets/objects/zombie/zombie.fbx",
-                    "texpath": "assets/objects/zombie/zombie.jpg",
-                    "pixelated": true,
-                    "draw": true
-                },
-                {
-                    "ID": 8,
-                    "path": "assets/scripts/zombie.lua"
-                },
-                {
-                    "ID": 6,
-                    "radius": 0.28,
-                    "height": 2.12
-                }
-            ],
-            "parentbonename": "",
-            "children": [
-                {
-                    "name": "sound",
-                    "tag": "",
-                    "transform": [
-                        0.0, 0.0, 1.25,
-                        86.0, 0.0, 0.0,
-                        1.0, 1.0, 1.0
-                    ],
-                    "components": [
-                        {
-                            "ID": 7,
-                            "path": "assets/sounds/zombiegroan.mp3",
-                            "volume": 8.0,
-                            "maxDistance": 20.0,
-                            "falloff": 1.0,
-                            "loop": false
-                        }
-                    ],
-                    "parentbonename": "Jaw_01",
-                    "children": []
-                }
-            ]
-        },
-        {
-            "name": "zombie9",
+            "name": "zombie",
             "tag": "zombie",
             "transform": [
                 1.6, 7.05, -12.5,
                 -381.0, 0.0, 0.0,
-                8.0, 8.0, 8.0
+                1.0, 1.0, 1.0
             ],
             "components": [
                 {
                     "ID": 1,
                     "meshpath": "assets/objects/zombie/zombie.fbx",
-                    "texpath": "assets/objects/zombie/zombie.jpg",
-                    "pixelated": true,
+                    "texpath": "assets/objects/zombie/zombie.png",
+                    "pixelated": false,
                     "draw": true
                 },
                 {
@@ -430,8 +22,8 @@
                 },
                 {
                     "ID": 6,
-                    "radius": 0.28,
-                    "height": 2.12
+                    "radius": 0.2,
+                    "height": 1.73
                 }
             ],
             "parentbonename": "",
@@ -460,19 +52,19 @@
             ]
         },
         {
-            "name": "zombie10",
+            "name": "zombie (1)",
             "tag": "zombie",
             "transform": [
-                -10.4, 7.05, -5.75,
-                -258.5, 0.0, 0.0,
-                8.0, 8.0, 8.0
+                -11.05, 7.05, -6.55,
+                -297.5, 0.0, 0.0,
+                1.0, 1.0, 1.0
             ],
             "components": [
                 {
                     "ID": 1,
                     "meshpath": "assets/objects/zombie/zombie.fbx",
-                    "texpath": "assets/objects/zombie/zombie.jpg",
-                    "pixelated": true,
+                    "texpath": "assets/objects/zombie/zombie.png",
+                    "pixelated": false,
                     "draw": true
                 },
                 {
@@ -481,8 +73,314 @@
                 },
                 {
                     "ID": 6,
-                    "radius": 0.28,
-                    "height": 2.12
+                    "radius": 0.2,
+                    "height": 1.73
+                }
+            ],
+            "parentbonename": "",
+            "children": [
+                {
+                    "name": "sound",
+                    "tag": "",
+                    "transform": [
+                        0.0, 0.0, 0.0,
+                        86.0, 0.0, 0.0,
+                        1.0, 1.0, 1.0
+                    ],
+                    "components": [
+                        {
+                            "ID": 7,
+                            "path": "assets/sounds/zombiegroan.mp3",
+                            "volume": 8.0,
+                            "maxDistance": 20.0,
+                            "falloff": 1.0,
+                            "loop": false
+                        }
+                    ],
+                    "parentbonename": "Jaw_01",
+                    "children": []
+                }
+            ]
+        },
+        {
+            "name": "zombie (2)",
+            "tag": "zombie",
+            "transform": [
+                1.6, 7.05, 10.3,
+                -169.5, 0.0, 0.0,
+                1.0, 1.0, 1.0
+            ],
+            "components": [
+                {
+                    "ID": 1,
+                    "meshpath": "assets/objects/zombie/zombie.fbx",
+                    "texpath": "assets/objects/zombie/zombie.png",
+                    "pixelated": false,
+                    "draw": true
+                },
+                {
+                    "ID": 8,
+                    "path": "assets/scripts/zombie.lua"
+                },
+                {
+                    "ID": 6,
+                    "radius": 0.2,
+                    "height": 1.73
+                }
+            ],
+            "parentbonename": "",
+            "children": [
+                {
+                    "name": "sound",
+                    "tag": "",
+                    "transform": [
+                        0.0, 0.0, 0.0,
+                        86.0, 0.0, 0.0,
+                        1.0, 1.0, 1.0
+                    ],
+                    "components": [
+                        {
+                            "ID": 7,
+                            "path": "assets/sounds/zombiegroan.mp3",
+                            "volume": 8.0,
+                            "maxDistance": 20.0,
+                            "falloff": 1.0,
+                            "loop": false
+                        }
+                    ],
+                    "parentbonename": "Jaw_01",
+                    "children": []
+                }
+            ]
+        },
+        {
+            "name": "zombie (3)",
+            "tag": "zombie",
+            "transform": [
+                1.6, 0.0, -12.5,
+                -421.0, 0.0, 0.0,
+                1.0, 1.0, 1.0
+            ],
+            "components": [
+                {
+                    "ID": 1,
+                    "meshpath": "assets/objects/zombie/zombie.fbx",
+                    "texpath": "assets/objects/zombie/zombie.png",
+                    "pixelated": false,
+                    "draw": true
+                },
+                {
+                    "ID": 8,
+                    "path": "assets/scripts/zombie.lua"
+                },
+                {
+                    "ID": 6,
+                    "radius": 0.2,
+                    "height": 1.73
+                }
+            ],
+            "parentbonename": "",
+            "children": [
+                {
+                    "name": "sound",
+                    "tag": "",
+                    "transform": [
+                        0.0, 0.0, 0.0,
+                        86.0, 0.0, 0.0,
+                        1.0, 1.0, 1.0
+                    ],
+                    "components": [
+                        {
+                            "ID": 7,
+                            "path": "assets/sounds/zombiegroan.mp3",
+                            "volume": 8.0,
+                            "maxDistance": 20.0,
+                            "falloff": 1.0,
+                            "loop": false
+                        }
+                    ],
+                    "parentbonename": "Jaw_01",
+                    "children": []
+                }
+            ]
+        },
+        {
+            "name": "zombie (4)",
+            "tag": "zombie",
+            "transform": [
+                -1.9, 0.0, -9.3,
+                -567.5, 0.0, 0.0,
+                1.0, 1.0, 1.0
+            ],
+            "components": [
+                {
+                    "ID": 1,
+                    "meshpath": "assets/objects/zombie/zombie.fbx",
+                    "texpath": "assets/objects/zombie/zombie.png",
+                    "pixelated": false,
+                    "draw": true
+                },
+                {
+                    "ID": 8,
+                    "path": "assets/scripts/zombie.lua"
+                },
+                {
+                    "ID": 6,
+                    "radius": 0.2,
+                    "height": 1.73
+                }
+            ],
+            "parentbonename": "",
+            "children": [
+                {
+                    "name": "sound",
+                    "tag": "",
+                    "transform": [
+                        0.0, 0.0, 0.0,
+                        86.0, 0.0, 0.0,
+                        1.0, 1.0, 1.0
+                    ],
+                    "components": [
+                        {
+                            "ID": 7,
+                            "path": "assets/sounds/zombiegroan.mp3",
+                            "volume": 8.0,
+                            "maxDistance": 20.0,
+                            "falloff": 1.0,
+                            "loop": false
+                        }
+                    ],
+                    "parentbonename": "Jaw_01",
+                    "children": []
+                }
+            ]
+        },
+        {
+            "name": "zombie (5)",
+            "tag": "zombie",
+            "transform": [
+                -1.9, 0.0, -1.25,
+                -576.0, 0.0, 0.0,
+                1.0, 1.0, 1.0
+            ],
+            "components": [
+                {
+                    "ID": 1,
+                    "meshpath": "assets/objects/zombie/zombie.fbx",
+                    "texpath": "assets/objects/zombie/zombie.png",
+                    "pixelated": false,
+                    "draw": true
+                },
+                {
+                    "ID": 8,
+                    "path": "assets/scripts/zombie.lua"
+                },
+                {
+                    "ID": 6,
+                    "radius": 0.2,
+                    "height": 1.73
+                }
+            ],
+            "parentbonename": "",
+            "children": [
+                {
+                    "name": "sound",
+                    "tag": "",
+                    "transform": [
+                        0.0, 0.0, 0.0,
+                        86.0, 0.0, 0.0,
+                        1.0, 1.0, 1.0
+                    ],
+                    "components": [
+                        {
+                            "ID": 7,
+                            "path": "assets/sounds/zombiegroan.mp3",
+                            "volume": 8.0,
+                            "maxDistance": 20.0,
+                            "falloff": 1.0,
+                            "loop": false
+                        }
+                    ],
+                    "parentbonename": "Jaw_01",
+                    "children": []
+                }
+            ]
+        },
+        {
+            "name": "zombie (6)",
+            "tag": "zombie",
+            "transform": [
+                -8.85, 0.0, -4.4,
+                -501.5, 0.0, 0.0,
+                1.0, 1.0, 1.0
+            ],
+            "components": [
+                {
+                    "ID": 1,
+                    "meshpath": "assets/objects/zombie/zombie.fbx",
+                    "texpath": "assets/objects/zombie/zombie.png",
+                    "pixelated": false,
+                    "draw": true
+                },
+                {
+                    "ID": 8,
+                    "path": "assets/scripts/zombie.lua"
+                },
+                {
+                    "ID": 6,
+                    "radius": 0.2,
+                    "height": 1.73
+                }
+            ],
+            "parentbonename": "",
+            "children": [
+                {
+                    "name": "sound",
+                    "tag": "",
+                    "transform": [
+                        0.0, 0.0, 0.0,
+                        86.0, 0.0, 0.0,
+                        1.0, 1.0, 1.0
+                    ],
+                    "components": [
+                        {
+                            "ID": 7,
+                            "path": "assets/sounds/zombiegroan.mp3",
+                            "volume": 8.0,
+                            "maxDistance": 20.0,
+                            "falloff": 1.0,
+                            "loop": false
+                        }
+                    ],
+                    "parentbonename": "Jaw_01",
+                    "children": []
+                }
+            ]
+        },
+        {
+            "name": "zombie (7)",
+            "tag": "zombie",
+            "transform": [
+                1.6, 0.0, -0.85,
+                -488.0, 0.0, 0.0,
+                1.0, 1.0, 1.0
+            ],
+            "components": [
+                {
+                    "ID": 1,
+                    "meshpath": "assets/objects/zombie/zombie.fbx",
+                    "texpath": "assets/objects/zombie/zombie.png",
+                    "pixelated": false,
+                    "draw": true
+                },
+                {
+                    "ID": 8,
+                    "path": "assets/scripts/zombie.lua"
+                },
+                {
+                    "ID": 6,
+                    "radius": 0.2,
+                    "height": 1.73
                 }
             ],
             "parentbonename": "",
@@ -524,7 +422,7 @@
                     "meshpath": "assets/objects/dungeon/FACILITY.obj",
                     "texpath": "assets/objects/dungeon/FACILITY.png",
                     "texscale": 10.0,
-                    "pixelated": true,
+                    "pixelated": false,
                     "draw": true
                 },
                 {
@@ -541,7 +439,7 @@
             "name": "player",
             "tag": "",
             "transform": [
-                0.0, 7.5, 0.0,
+                0.0, 7.0, 0.0,
                 0.0, 0.0, 0.0,
                 1.0, 1.0, 1.0
             ],
@@ -605,7 +503,7 @@
                                     "ID": 1,
                                     "meshpath": "assets/objects/glock/glocknhands.fbx",
                                     "texpath": "assets/objects/glock/glocknhands.png",
-                                    "pixelated": true,
+                                    "pixelated": false,
                                     "draw": true
                                 },
                                 {
@@ -634,7 +532,7 @@
                     "meshpath": "assets/objects/lights/rectlight.obj",
                     "texpath": "assets/objects/lights/rectlight.png",
                     "texscale": 1.0,
-                    "pixelated": true,
+                    "pixelated": false,
                     "draw": true
                 }
             ],
@@ -645,7 +543,7 @@
                     "tag": "",
                     "transform": [
                         0.0, 0.0, 0.0,
-                        0.0, 0.0, 0.0,
+                        0.0, 0.0, 180.0,
                         1.0, 1.0, 1.0
                     ],
                     "components": [
@@ -654,7 +552,7 @@
                             "meshpath": "assets/objects/lights/rectlightmid.obj",
                             "texpath": "assets/objects/lights/rectlightmid.png",
                             "texscale": 1.0,
-                            "pixelated": true,
+                            "pixelated": false,
                             "draw": true
                         },
                         {
@@ -682,7 +580,7 @@
                     "meshpath": "assets/objects/lights/rectlight.obj",
                     "texpath": "assets/objects/lights/rectlight.png",
                     "texscale": 1.0,
-                    "pixelated": true,
+                    "pixelated": false,
                     "draw": true
                 }
             ],
@@ -693,7 +591,7 @@
                     "tag": "",
                     "transform": [
                         0.0, 0.0, 0.0,
-                        0.0, 0.0, 0.0,
+                        0.0, 0.0, 180.0,
                         1.0, 1.0, 1.0
                     ],
                     "components": [
@@ -702,7 +600,7 @@
                             "meshpath": "assets/objects/lights/rectlightmid.obj",
                             "texpath": "assets/objects/lights/rectlightmid.png",
                             "texscale": 1.0,
-                            "pixelated": true,
+                            "pixelated": false,
                             "draw": true
                         },
                         {
@@ -730,7 +628,7 @@
                     "meshpath": "assets/objects/lights/rectlight.obj",
                     "texpath": "assets/objects/lights/rectlight.png",
                     "texscale": 1.0,
-                    "pixelated": true,
+                    "pixelated": false,
                     "draw": true
                 }
             ],
@@ -741,7 +639,7 @@
                     "tag": "",
                     "transform": [
                         0.0, 0.0, 0.0,
-                        0.0, 0.0, 0.0,
+                        0.0, 0.0, 180.0,
                         1.0, 1.0, 1.0
                     ],
                     "components": [
@@ -750,7 +648,7 @@
                             "meshpath": "assets/objects/lights/rectlightmid.obj",
                             "texpath": "assets/objects/lights/rectlightmid.png",
                             "texscale": 1.0,
-                            "pixelated": true,
+                            "pixelated": false,
                             "draw": true
                         },
                         {
@@ -778,7 +676,7 @@
                     "meshpath": "assets/objects/lights/rectlight.obj",
                     "texpath": "assets/objects/lights/rectlight.png",
                     "texscale": 1.0,
-                    "pixelated": true,
+                    "pixelated": false,
                     "draw": true
                 }
             ],
@@ -789,7 +687,7 @@
                     "tag": "",
                     "transform": [
                         0.0, 0.0, 0.0,
-                        0.0, 0.0, 0.0,
+                        0.0, 0.0, 180.0,
                         1.0, 1.0, 1.0
                     ],
                     "components": [
@@ -798,7 +696,7 @@
                             "meshpath": "assets/objects/lights/rectlightmid.obj",
                             "texpath": "assets/objects/lights/rectlightmid.png",
                             "texscale": 1.0,
-                            "pixelated": true,
+                            "pixelated": false,
                             "draw": true
                         },
                         {
@@ -826,7 +724,7 @@
                     "meshpath": "assets/objects/lights/rectlight.obj",
                     "texpath": "assets/objects/lights/rectlight.png",
                     "texscale": 1.0,
-                    "pixelated": true,
+                    "pixelated": false,
                     "draw": true
                 }
             ],
@@ -837,7 +735,7 @@
                     "tag": "",
                     "transform": [
                         0.0, 0.0, 0.0,
-                        0.0, 0.0, 0.0,
+                        0.0, 0.0, 180.0,
                         1.0, 1.0, 1.0
                     ],
                     "components": [
@@ -846,7 +744,7 @@
                             "meshpath": "assets/objects/lights/rectlightmid.obj",
                             "texpath": "assets/objects/lights/rectlightmid.png",
                             "texscale": 1.0,
-                            "pixelated": true,
+                            "pixelated": false,
                             "draw": true
                         },
                         {
@@ -874,7 +772,7 @@
                     "meshpath": "assets/objects/lights/linelight.obj",
                     "texpath": "assets/objects/lights/rectlightmid.png",
                     "texscale": 1.0,
-                    "pixelated": true,
+                    "pixelated": false,
                     "draw": true
                 },
                 {
@@ -900,7 +798,7 @@
                     "meshpath": "assets/objects/lights/linelight.obj",
                     "texpath": "assets/objects/lights/rectlightmid.png",
                     "texscale": 1.0,
-                    "pixelated": true,
+                    "pixelated": false,
                     "draw": true
                 },
                 {
@@ -1086,5 +984,5 @@
         "assets/scripts/fps.lua"
     ],
     "ambient": 0.1,
-    "lightmapResScalar": 0.01
+    "lightmapResScalar": 0.025
 }

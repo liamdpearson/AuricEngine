@@ -38,7 +38,7 @@ function hit(damage)
 
     damage = damage or 1
     health = health - damage
-    capsule.velocity = capsule.velocity - toPlayer:normalized() * 5.0
+    capsule.velocity = capsule.velocity - toPlayer:normalized() * 10.0
     if health <= 0 then
         state = 3
         time = 0
@@ -49,6 +49,7 @@ function hit(damage)
         num = math.random(1, 3)
         soundPlayer.volume = 5
         soundPlayer:Play("assets/sounds/zombiehit" .. tostring(num) .. ".mp3")
+        rig:setAnim(4, 0.1, state)
     end
 end
 
@@ -80,7 +81,7 @@ function update(deltaTime)
                 attackTimer = 1.625
             end
         else
-            attackTimer = 0.7
+           attackTimer = 1.0
         end
 
         head = self.transform:pos()
@@ -121,12 +122,12 @@ function update(deltaTime)
             end
         end
 
-        capsule.velocity = capsule.velocity + moveDir * 10 * deltaTime
+        capsule.velocity = capsule.velocity + moveDir * 33 * deltaTime
     end
 
     resolveMovement(deltaTime)
     
-    if rig.currentAnim ~= state then
+    if rig.currentAnim ~= state and rig.currentAnim ~= 4 then
         rig:setAnim(state, 0.5)
     end
 end

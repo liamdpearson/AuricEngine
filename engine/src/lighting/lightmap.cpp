@@ -69,7 +69,7 @@ static bool GenUV2(xatlas::Atlas*& atlas, std::vector<float>& verts,
     xatlas::ChartOptions chartOptions;
     xatlas::PackOptions packOptions;
     packOptions.resolution = resolution;
-    packOptions.padding = 8;
+    packOptions.padding = 4;
 
     xatlas::Generate(atlas, chartOptions, packOptions);
 
@@ -329,7 +329,7 @@ static void bakeLightmap(LightMapComponent* lm, MeshComponent* mesh)
     // technically arent in the triangle but their corner bleeds into
     // the triangle. loops twice to be accurate which is safe because
     // the atlas has an island padding of 4 texels.
-    for (int j = 0; j < 3; j++) {
+    for (int j = 0; j < 2; j++) {
         std::vector<int> copy = covMask;
         for (size_t i = 0; i < covMask.size(); ++i)
         {
