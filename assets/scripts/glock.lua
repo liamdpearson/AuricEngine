@@ -19,10 +19,22 @@ local function shoot()
     local origin = cam.pos
     local dir = cam.front:normalized()
 
+    local closestDist = 100
+    local closestZombie
+
     for _, z in ipairs(zombies) do
         local d = raycast.hitCapsule(origin, dir, 100, z.capsule)
-        if d > 0.0 and not raycast.occluded(origin, dir, d) then
-            z.script.hit()
+        if d > 0.0 then
+            if d < closestDist then
+                closestDist = d
+                closestZombie = z
+            end
+        end
+    end
+
+    if closestZombie ~= nil then
+        if not raycast.occluded(origin, dir, closestDist) then
+            closestZombie.script.hit()
         end
     end
 end
